@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/*
+  Tailwind se importa ANTES que base.css en main.jsx, a proposito.
+
+  Su preflight es un reset: pone los margenes de titulares a cero, quita el
+  estilo de los botones, etc. Si se cargara despues, pisaria las decisiones
+  tipograficas del portafolio. Cargandolo primero, base.css tiene la ultima
+  palabra sobre los elementos, y las clases utilitarias siguen disponibles
+  para los componentes que las usen.
+
+  Los tokens del portafolio se exponen como colores de Tailwind para poder
+  escribir `bg-shell` o `text-ink` sin repetir hex.
+*/
+@theme {
+  --color-shell: #F0EFEB;
+  --color-paper: #FFFFFF;
+  --color-fog:   #F4F4F4;
+  --color-sand:  #D6D5D2;
+  --color-ink:   #111111;
+  --color-body:  #54595F;
+  --color-mute:  #7A7A7A;
+}

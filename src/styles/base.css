@@ -1,0 +1,412 @@
+/* ══════════════════════════════════════════════════════════════
+   Marina Olivares — portafolio de arquitectura
+   Mundo visual único y deliberado: la luz cálida de galería.
+   No hay variante oscura porque el encargo era calcar esa
+   atmósfera concreta; el negro aparece como contrapunto en dos
+   secciones, no como tema alternativo.
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: light;
+
+  --shell: #F0EFEB;   /* fondo cálido: el neutro está sesgado a ocre, no es gris puro */
+  --paper: #FFFFFF;
+  --fog:   #F4F4F4;
+  --sand:  #D6D5D2;   /* bordes y trazos */
+  --ink:   #111111;   /* titulares y CTA — 16.4:1 sobre shell */
+  --body:  #54595F;   /* cuerpo — 6.14:1 sobre shell */
+  --mute:  #7A7A7A;   /* SOLO texto grande: 3.73:1, insuficiente para cuerpo */
+  --alarm: #F5A3A3;
+
+  --w:     1400px;
+  --pad:   1.5rem;
+  --gap:   1.5rem;
+
+  --t-fast: .2s;
+  --t-mid:  .35s;
+  --ease:   cubic-bezier(.22,.61,.36,1);
+}
+@media (min-width: 768px) { :root { --pad: 2.5rem; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--shell);
+  color: var(--body);
+  font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, p, ol, ul, dl, dd, dt, figure { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
+.oscuro :focus-visible { outline-color: var(--paper); }
+
+.sr {
+  position: absolute; width: 1px; height: 1px; padding: 0;
+  margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.saltar:focus {
+  position: fixed; top: 1rem; left: 1rem; z-index: 80;
+  width: auto; height: auto; margin: 0; clip: auto; overflow: visible;
+  background: var(--ink); color: var(--paper); padding: .9rem 1.4rem; font-size: .875rem;
+}
+
+/* ── Rejilla ─────────────────────────────────────────────── */
+.wrap { width: 100%; max-width: var(--w); margin-inline: auto; padding-inline: var(--pad); }
+.g12 { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); }
+
+/* ── Escala tipográfica ──────────────────────────────────── */
+.display {
+  font-weight: 200;
+  font-size: clamp(2.6rem, 9vw, 7.5rem);
+  line-height: .95;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.h2 {
+  font-weight: 200;
+  font-size: clamp(2rem, 5.2vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--body);
+}
+.lead { font-size: clamp(1rem, 1.6vw, 1.15rem); line-height: 1.65; max-width: 46ch; }
+.small { font-size: .875rem; line-height: 1.6; }
+
+/* ── Navegación ──────────────────────────────────────────── */
+.nav {
+  position: fixed; inset-inline: 0; top: 0; z-index: 40;
+  transition: transform var(--t-mid) var(--ease), background-color var(--t-fast), border-color var(--t-fast);
+  border-bottom: 1px solid transparent;
+}
+.nav.pegada { background: rgba(240,239,235,.9); backdrop-filter: blur(8px); border-bottom-color: var(--sand); }
+.nav.oculta { transform: translateY(-100%); }
+.nav-fila { display: flex; align-items: center; justify-content: space-between; height: 5rem; }
+@media (min-width: 768px) { .nav-fila { height: 6rem; } }
+
+.marca { font-size: .875rem; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); }
+.nav-links { display: none; }
+@media (min-width: 768px) {
+  .nav-links { display: flex; align-items: center; gap: 2.5rem; }
+  .nav-links a { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); padding-block: .75rem; display: inline-block; }
+}
+
+/* Subrayado que crece desde la izquierda */
+.sub { position: relative; }
+.sub::after {
+  content: ''; position: absolute; left: 0; bottom: -4px; width: 100%; height: 1px;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform var(--t-mid) var(--ease);
+}
+.sub:hover::after, .sub:focus-visible::after { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) { .sub::after { transition: none; } }
+
+.hamb {
+  display: grid; place-items: center; width: 44px; height: 44px;
+  margin-right: -.5rem; background: none; border: 0; color: var(--ink); cursor: pointer;
+}
+@media (min-width: 768px) { .hamb { display: none; } }
+.menu-movil { display: none; background: var(--shell); border-top: 1px solid var(--sand); }
+.menu-movil.abierto { display: block; }
+@media (min-width: 768px) { .menu-movil.abierto { display: none; } }
+.menu-movil a {
+  display: block; padding: 1rem 0; font-size: .875rem; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--ink); border-bottom: 1px solid rgba(214,213,210,.6);
+}
+.menu-movil li:last-child a { border-bottom: 0; }
+
+/* ── Botones ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: .75rem;
+  background: var(--ink); color: var(--paper); border: 0;
+  padding: 1rem 2rem; min-height: 44px;
+  font-size: 13px; letter-spacing: .22em; text-transform: uppercase;
+  cursor: pointer; will-change: transform;
+  transition: background-color var(--t-fast);
+}
+.btn:hover { background: var(--body); }
+.btn.claro { background: var(--paper); color: var(--ink); }
+.btn.claro:hover { background: var(--sand); }
+.btn svg { transition: transform var(--t-fast); }
+.btn:hover svg { transform: translateX(4px); }
+@media (prefers-reduced-motion: reduce) {
+  .btn svg { transition: none; }
+  .btn:hover svg { transform: none; }
+}
+
+.enlace-simple { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); padding-block: .75rem; display: inline-block; }
+
+/* ── Hero ────────────────────────────────────────────────── */
+.hero {
+  position: relative; min-height: 92svh; display: flex; align-items: flex-end;
+  padding-top: 8rem; padding-bottom: 4rem; overflow: hidden;
+}
+.hero-fondo { position: absolute; inset: 0; z-index: -1; }
+#parallax { position: absolute; inset: 0; will-change: transform; }
+#plano { position: absolute; right: -8%; top: 6%; width: 62%; max-width: 820px; opacity: .55; }
+.hero .g12 { row-gap: 2.5rem; }
+.hero .c-eyebrow { grid-column: 1 / -1; }
+.hero h1 { grid-column: 1 / -1; }
+@media (min-width: 1024px) { .hero h1 { grid-column: 1 / span 10; } }
+.hero .c-lead { grid-column: 1 / -1; }
+@media (min-width: 768px)  { .hero .c-lead { grid-column: 1 / span 7; } }
+@media (min-width: 1024px) { .hero .c-lead { grid-column: 1 / span 5; } }
+.hero .c-cta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2rem; padding-top: .5rem; }
+
+.indicador {
+  position: absolute; bottom: 2rem; right: var(--pad);
+  display: flex; align-items: center; gap: .75rem;
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--body);
+}
+.riel { display: block; position: relative; width: 40px; height: 1px; background: var(--sand); overflow: hidden; }
+.riel span { position: absolute; inset: 0; background: var(--ink); }
+
+/* ── Titulares partidos en letras ──────────────────────────
+   La letra es la unidad de animación, pero NO la de lectura:
+   cada .pal lleva aria-hidden y el titular conserva su
+   aria-label con la frase entera. */
+.display, .h2 { perspective: 700px; }
+.pal { display: inline-block; white-space: nowrap; }
+.ltr { display: inline-block; will-change: transform; transform-origin: 50% 100%; }
+
+/* Enlaces de navegación: la onda recorre las letras al pasar por encima */
+.roll .ltr { will-change: transform; }
+
+/* Tarjetas que se inclinan hacia el cursor */
+.card a { display: block; perspective: 900px; }
+.marco { transform-style: preserve-3d; }
+
+/* Foco de luz que sigue al cursor sobre el manifiesto */
+#foco {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(340px circle at var(--fx, 50%) var(--fy, 50%), rgba(255,255,255,.09), transparent 70%);
+  transition: opacity .4s ease;
+}
+.manifiesto { position: relative; overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { #foco { display: none; } }
+
+/* ── Marquesina ──────────────────────────────────────────── */
+.tira { border-block: 1px solid var(--sand); padding-block: 1.5rem; overflow: hidden; }
+.tira-pista { display: flex; gap: 3rem; white-space: nowrap; will-change: transform; }
+.tira-grupo { display: flex; gap: 3rem; flex-shrink: 0; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); }
+.punto { color: var(--sand); }
+
+/* ── Cifras ──────────────────────────────────────────────── */
+.cifras { border-bottom: 1px solid var(--sand); }
+.cifras dl { display: grid; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 1024px) { .cifras dl { grid-template-columns: repeat(4, 1fr); } }
+.cifra { padding-block: 2.5rem; }
+@media (min-width: 1024px) { .cifra { padding-block: 3.5rem; padding-inline: 2.5rem; } }
+.cifra + .cifra { border-top: 1px solid var(--sand); }
+@media (min-width: 1024px) {
+  .cifra + .cifra { border-top: 0; border-left: 1px solid var(--sand); }
+  .cifra:first-child { padding-left: 0; }
+  .cifra:last-child  { padding-right: 0; }
+}
+.cifra dd {
+  margin-top: .75rem; font-weight: 200; color: var(--ink);
+  font-size: clamp(2.25rem, 4vw, 3rem); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Proyectos ───────────────────────────────────────────── */
+.seccion { padding-block: 6rem; }
+@media (min-width: 768px) { .seccion { padding-block: 9rem; } }
+
+.cabecera { row-gap: 1.5rem; align-items: end; margin-bottom: 3.5rem; }
+@media (min-width: 768px) { .cabecera { margin-bottom: 5rem; } }
+.cabecera .c-titulo { grid-column: 1 / -1; }
+.cabecera .c-nota   { grid-column: 1 / -1; }
+@media (min-width: 768px) {
+  .cabecera .c-titulo { grid-column: 1 / span 7; }
+  .cabecera .c-nota   { grid-column: 8 / -1; text-align: right; }
+}
+
+.filtros { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 3rem; }
+.filtro {
+  min-height: 44px; padding: .5rem 1.25rem;
+  font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+  background: transparent; color: var(--ink); border: 1px solid var(--sand);
+  cursor: pointer; transition: border-color var(--t-fast), background-color var(--t-fast), color var(--t-fast);
+}
+.filtro:hover { border-color: var(--ink); }
+.filtro[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+.grilla { row-gap: 3.5rem; }
+@media (min-width: 768px) { .grilla { row-gap: 5rem; } }
+.card { grid-column: 1 / -1; }
+/* Anchos y desfases desiguales: el ritmo editorial nace de la grilla, no del adorno */
+@media (min-width: 768px) {
+  .card.w7 { grid-column: span 7; }
+  .card.w5 { grid-column: span 5; }
+  .card.w6 { grid-column: span 6; }
+  .card.d24 { padding-top: 6rem; }
+  .card.d20 { padding-top: 5rem; }
+  .card.d16 { padding-top: 4rem; }
+}
+.card.oculta { display: none; }
+
+.marco { overflow: hidden; background: var(--fog); }
+.marco.r43 { aspect-ratio: 4 / 3; }
+.marco.r34 { aspect-ratio: 3 / 4; }
+.marco.r11 { aspect-ratio: 1 / 1; }
+.shot { width: 100%; height: 100%; transform: scale(1.1); will-change: transform; }
+
+.pie-card { padding-top: 1.5rem; display: flex; align-items: baseline; justify-content: space-between; gap: 1.5rem; }
+.pie-card h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 300; color: var(--ink); }
+.pie-card .meta { margin-top: .25rem; font-size: .875rem; }
+.pie-card .num { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--body); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.leer {
+  margin-top: .5rem; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink);
+  opacity: 0; transform: translateY(6px); transition: opacity var(--t-mid), transform var(--t-mid);
+}
+.card a:hover .leer, .card a:focus-visible .leer { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .leer { opacity: 1; transform: none; transition: none; } }
+
+.vacio { display: none; padding-block: 5rem; text-align: center; }
+.vacio.visible { display: block; }
+
+/* ── Manifiesto (contrapunto oscuro, única sección anclada) ── */
+.manifiesto { background: var(--ink); color: var(--paper); }
+.manifiesto .caja { min-height: 100vh; display: flex; align-items: center; padding-block: 6rem; max-width: 1200px; }
+.mani {
+  font-weight: 200; letter-spacing: -.01em;
+  font-size: clamp(1.5rem, 4.2vw, 3.25rem); line-height: 1.25;
+}
+.mani span { color: var(--sand); }
+
+/* ── Estudio ─────────────────────────────────────────────── */
+.estudio { background: var(--paper); border-bottom: 1px solid var(--sand); }
+.estudio .g12 { row-gap: 3rem; }
+.estudio .c-izq { grid-column: 1 / -1; }
+.estudio .c-der { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 1.5rem; }
+@media (min-width: 768px) {
+  .estudio .c-izq { grid-column: 1 / span 5; }
+  .estudio .c-der { grid-column: 7 / -1; }
+}
+.ficha { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; padding-top: 1rem; font-size: .875rem; }
+.ficha p + p { margin-top: .5rem; color: var(--ink); }
+
+/* ── Proceso: es una secuencia real, por eso va numerado ─── */
+.etapas { row-gap: 3rem; }
+.etapa { grid-column: 1 / -1; position: relative; padding-top: 1.5rem; }
+@media (min-width: 768px) { .etapa { grid-column: span 3; } }
+.regla { position: absolute; top: 0; left: 0; display: block; width: 100%; height: 1px; background: var(--ink); transform-origin: left; }
+.etapa h3 { margin-top: .75rem; font-size: 1.25rem; font-weight: 300; color: var(--ink); }
+.etapa p.small { margin-top: .75rem; }
+
+/* ── Contacto ────────────────────────────────────────────── */
+.contacto { background: var(--ink); color: var(--paper); }
+.contacto .g12 { row-gap: 4rem; }
+.contacto .c-datos { grid-column: 1 / -1; }
+.contacto .c-form  { grid-column: 1 / -1; }
+@media (min-width: 1024px) {
+  .contacto .c-datos { grid-column: 1 / span 5; }
+  .contacto .c-form  { grid-column: 7 / -1; }
+}
+.contacto .h2, .contacto .display { color: var(--paper); }
+.contacto .eyebrow { color: var(--sand); }
+.datos { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; font-size: .875rem; }
+.datos .valor { margin-top: .5rem; display: inline-block; color: var(--paper); font-size: 1rem; }
+
+.campo + .campo { margin-top: 2rem; }
+.campo label { display: block; margin-bottom: .75rem; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--sand); }
+.campo input, .campo textarea, .campo select {
+  width: 100%; min-height: 44px; padding-block: .75rem;
+  background: transparent; color: var(--paper); font-size: 1rem;
+  border: 0; border-bottom: 1px solid rgba(214,213,210,.5);
+  transition: border-color var(--t-fast);
+}
+.campo select { background: var(--ink); cursor: pointer; }
+.campo textarea { resize: vertical; }
+.campo input:focus, .campo textarea:focus, .campo select:focus { outline: none; border-bottom-color: var(--paper); }
+.campo [aria-invalid="true"] { border-bottom-color: var(--alarm); }
+.ayuda { margin-top: .5rem; font-size: .875rem; color: var(--sand); }
+.error { display: none; margin-top: .5rem; font-size: .875rem; color: var(--alarm); }
+.error.visible { display: block; }
+form .btn { margin-top: 2rem; }
+#form-estado { margin-top: 1rem; font-size: .875rem; color: var(--sand); }
+
+/* ── Pie ─────────────────────────────────────────────────── */
+.pie { background: var(--ink); color: var(--sand); border-top: 1px solid rgba(255,255,255,.1); }
+.pie-fila {
+  padding-block: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem;
+  font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+}
+@media (min-width: 768px) { .pie-fila { flex-direction: row; align-items: center; justify-content: space-between; } }
+.pie-fila ul { display: flex; flex-wrap: wrap; gap: .75rem 2rem; }
+.pie-fila a { display: inline-block; padding-block: .5rem; }
+
+/* ── Preloader ───────────────────────────────────────────────
+   Ya no se oculta por CSS: React lo monta y desmonta, y con
+   movimiento reducido no llega a montarse nunca. */
+#preloader {
+  display: flex; position: fixed; inset: 0; z-index: 70;
+  background: var(--ink); color: var(--paper);
+  align-items: flex-end; justify-content: space-between;
+  padding: 0 var(--pad) 2.5rem;
+}
+#contador { font-weight: 200; line-height: 1; font-size: clamp(3rem, 14vw, 10rem); font-variant-numeric: tabular-nums; }
+
+/* ── Cursor propio: adorno, nunca información ────────────── */
+.cursor-punto, .cursor-aro {
+  position: fixed; top: 0; left: 0; z-index: 60; pointer-events: none;
+  border-radius: 9999px; mix-blend-mode: difference;
+}
+.cursor-punto { width: 6px;  height: 6px;  background: #FFF; margin: -3px 0 0 -3px; }
+.cursor-aro   { width: 40px; height: 40px; border: 1px solid #FFF; margin: -20px 0 0 -20px; }
+@media (hover: none), (pointer: coarse) { .cursor-punto, .cursor-aro { display: none; } }
+
+/* ══════════════════════════════════════════════════════════════
+   Piezas de movimiento anadidas
+   ══════════════════════════════════════════════════════════════ */
+
+/* Linea de progreso de lectura: la cota del plano, continuada arriba */
+.progreso {
+  position: fixed; inset-inline: 0; top: 0; z-index: 50;
+  height: 2px; background: var(--ink);
+  transform-origin: 0 50%; transform: scaleX(0);
+}
+
+/* Capa que se desplaza dentro del marco recortado.
+   El dibujo va al 110% (regla .shot) para que el recorrido del parallax
+   no llegue nunca a descubrir un borde vacio. */
+.capa-dibujo { width: 100%; height: 100%; will-change: transform; }
+
+/* Mascara del numero: recorta mientras sube */
+.mascara-cifra { display: block; overflow: hidden; }
+.mascara-cifra > span { display: block; }
+
+/* Seccion activa: el subrayado se queda puesto */
+.nav-links a[aria-current]::after { transform: scaleX(1); }
+.menu-movil a[aria-current] { color: var(--ink); font-weight: 500; }
+
+/* El numero del proyecto acompana al cursor sobre la tarjeta */
+.pie-card .num { transition: transform var(--t-mid) var(--ease), color var(--t-mid); }
+.card a:hover .num, .card a:focus-visible .num { transform: translateY(-4px); color: var(--ink); }
+@media (prefers-reduced-motion: reduce) {
+  .pie-card .num { transition: none; }
+  .card a:hover .num, .card a:focus-visible .num { transform: none; }
+}

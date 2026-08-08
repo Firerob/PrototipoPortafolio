@@ -1,0 +1,1313 @@
+<title>Marina Olivares — Arquitectura</title>
+
+<style>
+/*FONTS*/
+
+/* ══════════════════════════════════════════════════════════════
+   Marina Olivares — portafolio de arquitectura
+   Mundo visual único y deliberado: la luz cálida de galería.
+   No hay variante oscura porque el encargo era calcar esa
+   atmósfera concreta; el negro aparece como contrapunto en dos
+   secciones, no como tema alternativo.
+   ══════════════════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: light;
+
+  --shell: #F0EFEB;   /* fondo cálido: el neutro está sesgado a ocre, no es gris puro */
+  --paper: #FFFFFF;
+  --fog:   #F4F4F4;
+  --sand:  #D6D5D2;   /* bordes y trazos */
+  --ink:   #111111;   /* titulares y CTA — 16.4:1 sobre shell */
+  --body:  #54595F;   /* cuerpo — 6.14:1 sobre shell */
+  --mute:  #7A7A7A;   /* SOLO texto grande: 3.73:1, insuficiente para cuerpo */
+  --alarm: #F5A3A3;
+
+  --w:     1400px;
+  --pad:   1.5rem;
+  --gap:   1.5rem;
+
+  --t-fast: .2s;
+  --t-mid:  .35s;
+  --ease:   cubic-bezier(.22,.61,.36,1);
+}
+@media (min-width: 768px) { :root { --pad: 2.5rem; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--shell);
+  color: var(--body);
+  font-family: Poppins, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, p, ol, ul, dl, dd, dt, figure { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+html { scroll-behavior: smooth; }
+.quieto, .quieto * { scroll-behavior: auto !important; }
+
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
+.oscuro :focus-visible { outline-color: var(--paper); }
+
+.sr {
+  position: absolute; width: 1px; height: 1px; padding: 0;
+  margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.saltar:focus {
+  position: fixed; top: 1rem; left: 1rem; z-index: 80;
+  width: auto; height: auto; margin: 0; clip: auto; overflow: visible;
+  background: var(--ink); color: var(--paper); padding: .9rem 1.4rem; font-size: .875rem;
+}
+
+/* ── Rejilla ─────────────────────────────────────────────── */
+.wrap { width: 100%; max-width: var(--w); margin-inline: auto; padding-inline: var(--pad); }
+.g12 { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); }
+
+/* ── Escala tipográfica ──────────────────────────────────── */
+.display {
+  font-weight: 200;
+  font-size: clamp(2.6rem, 9vw, 7.5rem);
+  line-height: .95;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.h2 {
+  font-weight: 200;
+  font-size: clamp(2rem, 5.2vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.eyebrow {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--body);
+}
+.lead { font-size: clamp(1rem, 1.6vw, 1.15rem); line-height: 1.65; max-width: 46ch; }
+.small { font-size: .875rem; line-height: 1.6; }
+
+/* ── Navegación ──────────────────────────────────────────── */
+.nav {
+  position: fixed; inset-inline: 0; top: 0; z-index: 40;
+  transition: transform var(--t-mid) var(--ease), background-color var(--t-fast), border-color var(--t-fast);
+  border-bottom: 1px solid transparent;
+}
+.nav.pegada { background: rgba(240,239,235,.9); backdrop-filter: blur(8px); border-bottom-color: var(--sand); }
+.nav.oculta { transform: translateY(-100%); }
+.nav-fila { display: flex; align-items: center; justify-content: space-between; height: 5rem; }
+@media (min-width: 768px) { .nav-fila { height: 6rem; } }
+
+.marca { font-size: .875rem; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); }
+.nav-links { display: none; }
+@media (min-width: 768px) {
+  .nav-links { display: flex; align-items: center; gap: 2.5rem; }
+  .nav-links a { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); padding-block: .75rem; display: inline-block; }
+}
+
+/* Subrayado que crece desde la izquierda */
+.sub { position: relative; }
+.sub::after {
+  content: ''; position: absolute; left: 0; bottom: -4px; width: 100%; height: 1px;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform var(--t-mid) var(--ease);
+}
+.sub:hover::after, .sub:focus-visible::after { transform: scaleX(1); }
+.quieto .sub::after { transition: none; }
+
+.hamb {
+  display: grid; place-items: center; width: 44px; height: 44px;
+  margin-right: -.5rem; background: none; border: 0; color: var(--ink); cursor: pointer;
+}
+@media (min-width: 768px) { .hamb { display: none; } }
+.menu-movil { display: none; background: var(--shell); border-top: 1px solid var(--sand); }
+.menu-movil.abierto { display: block; }
+@media (min-width: 768px) { .menu-movil.abierto { display: none; } }
+.menu-movil a {
+  display: block; padding: 1rem 0; font-size: .875rem; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--ink); border-bottom: 1px solid rgba(214,213,210,.6);
+}
+.menu-movil li:last-child a { border-bottom: 0; }
+
+/* ── Botones ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: .75rem;
+  background: var(--ink); color: var(--paper); border: 0;
+  padding: 1rem 2rem; min-height: 44px;
+  font-size: 13px; letter-spacing: .22em; text-transform: uppercase;
+  cursor: pointer; will-change: transform;
+  transition: background-color var(--t-fast);
+}
+.btn:hover { background: var(--body); }
+.btn.claro { background: var(--paper); color: var(--ink); }
+.btn.claro:hover { background: var(--sand); }
+.btn svg { transition: transform var(--t-fast); }
+.btn:hover svg { transform: translateX(4px); }
+.quieto .btn svg { transition: none; }
+.quieto .btn:hover svg { transform: none; }
+
+.enlace-simple { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); padding-block: .75rem; display: inline-block; }
+
+/* ── Hero ────────────────────────────────────────────────── */
+.hero {
+  position: relative; min-height: 92svh; display: flex; align-items: flex-end;
+  padding-top: 8rem; padding-bottom: 4rem; overflow: hidden;
+}
+.hero-fondo { position: absolute; inset: 0; z-index: -1; }
+#parallax { position: absolute; inset: 0; will-change: transform; }
+#plano { position: absolute; right: -8%; top: 6%; width: 62%; max-width: 820px; opacity: .55; }
+.hero .g12 { row-gap: 2.5rem; }
+.hero .c-eyebrow { grid-column: 1 / -1; }
+.hero h1 { grid-column: 1 / -1; }
+@media (min-width: 1024px) { .hero h1 { grid-column: 1 / span 10; } }
+.hero .c-lead { grid-column: 1 / -1; }
+@media (min-width: 768px)  { .hero .c-lead { grid-column: 1 / span 7; } }
+@media (min-width: 1024px) { .hero .c-lead { grid-column: 1 / span 5; } }
+.hero .c-cta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2rem; padding-top: .5rem; }
+
+.indicador {
+  position: absolute; bottom: 2rem; right: var(--pad);
+  display: flex; align-items: center; gap: .75rem;
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--body);
+}
+.riel { display: block; position: relative; width: 40px; height: 1px; background: var(--sand); overflow: hidden; }
+.riel span { position: absolute; inset: 0; background: var(--ink); }
+
+/* ── Titulares partidos en letras ──────────────────────────
+   La letra es la unidad de animación, pero NO la de lectura:
+   cada .pal lleva aria-hidden y el titular conserva su
+   aria-label con la frase entera. */
+.display, .h2 { perspective: 700px; }
+.pal { display: inline-block; white-space: nowrap; }
+.ltr { display: inline-block; will-change: transform; transform-origin: 50% 100%; }
+
+/* Enlaces de navegación: la onda recorre las letras al pasar por encima */
+.roll .ltr { will-change: transform; }
+
+/* Tarjetas que se inclinan hacia el cursor */
+.card a { display: block; perspective: 900px; }
+.marco { transform-style: preserve-3d; }
+
+/* Foco de luz que sigue al cursor sobre el manifiesto */
+#foco {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(340px circle at var(--fx, 50%) var(--fy, 50%), rgba(255,255,255,.09), transparent 70%);
+  transition: opacity .4s ease;
+}
+.manifiesto { position: relative; overflow: hidden; }
+.quieto #foco { display: none; }
+
+/* ── Marquesina ──────────────────────────────────────────── */
+.tira { border-block: 1px solid var(--sand); padding-block: 1.5rem; overflow: hidden; }
+.tira-pista { display: flex; gap: 3rem; white-space: nowrap; will-change: transform; }
+.tira-grupo { display: flex; gap: 3rem; flex-shrink: 0; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); }
+.punto { color: var(--sand); }
+
+/* ── Cifras ──────────────────────────────────────────────── */
+.cifras { border-bottom: 1px solid var(--sand); }
+.cifras dl { display: grid; grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 1024px) { .cifras dl { grid-template-columns: repeat(4, 1fr); } }
+.cifra { padding-block: 2.5rem; }
+@media (min-width: 1024px) { .cifra { padding-block: 3.5rem; padding-inline: 2.5rem; } }
+.cifra + .cifra { border-top: 1px solid var(--sand); }
+@media (min-width: 1024px) {
+  .cifra + .cifra { border-top: 0; border-left: 1px solid var(--sand); }
+  .cifra:first-child { padding-left: 0; }
+  .cifra:last-child  { padding-right: 0; }
+}
+.cifra dd {
+  margin-top: .75rem; font-weight: 200; color: var(--ink);
+  font-size: clamp(2.25rem, 4vw, 3rem); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Proyectos ───────────────────────────────────────────── */
+.seccion { padding-block: 6rem; }
+@media (min-width: 768px) { .seccion { padding-block: 9rem; } }
+
+.cabecera { row-gap: 1.5rem; align-items: end; margin-bottom: 3.5rem; }
+@media (min-width: 768px) { .cabecera { margin-bottom: 5rem; } }
+.cabecera .c-titulo { grid-column: 1 / -1; }
+.cabecera .c-nota   { grid-column: 1 / -1; }
+@media (min-width: 768px) {
+  .cabecera .c-titulo { grid-column: 1 / span 7; }
+  .cabecera .c-nota   { grid-column: 8 / -1; text-align: right; }
+}
+
+.filtros { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 3rem; }
+.filtro {
+  min-height: 44px; padding: .5rem 1.25rem;
+  font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+  background: transparent; color: var(--ink); border: 1px solid var(--sand);
+  cursor: pointer; transition: border-color var(--t-fast), background-color var(--t-fast), color var(--t-fast);
+}
+.filtro:hover { border-color: var(--ink); }
+.filtro[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+.grilla { row-gap: 3.5rem; }
+@media (min-width: 768px) { .grilla { row-gap: 5rem; } }
+.card { grid-column: 1 / -1; }
+/* Anchos y desfases desiguales: el ritmo editorial nace de la grilla, no del adorno */
+@media (min-width: 768px) {
+  .card.w7 { grid-column: span 7; }
+  .card.w5 { grid-column: span 5; }
+  .card.w6 { grid-column: span 6; }
+  .card.d24 { padding-top: 6rem; }
+  .card.d20 { padding-top: 5rem; }
+  .card.d16 { padding-top: 4rem; }
+}
+.card.oculta { display: none; }
+
+.marco { overflow: hidden; background: var(--fog); }
+.marco.r43 { aspect-ratio: 4 / 3; }
+.marco.r34 { aspect-ratio: 3 / 4; }
+.marco.r11 { aspect-ratio: 1 / 1; }
+.shot { width: 100%; height: 100%; transform: scale(1.1); will-change: transform; }
+
+.pie-card { padding-top: 1.5rem; display: flex; align-items: baseline; justify-content: space-between; gap: 1.5rem; }
+.pie-card h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 300; color: var(--ink); }
+.pie-card .meta { margin-top: .25rem; font-size: .875rem; }
+.pie-card .num { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--body); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.leer {
+  margin-top: .5rem; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink);
+  opacity: 0; transform: translateY(6px); transition: opacity var(--t-mid), transform var(--t-mid);
+}
+.card a:hover .leer, .card a:focus-visible .leer { opacity: 1; transform: none; }
+.quieto .leer { opacity: 1; transform: none; transition: none; }
+
+.vacio { display: none; padding-block: 5rem; text-align: center; }
+.vacio.visible { display: block; }
+
+/* ── Manifiesto (contrapunto oscuro, única sección anclada) ── */
+.manifiesto { background: var(--ink); color: var(--paper); }
+.manifiesto .caja { min-height: 100vh; display: flex; align-items: center; padding-block: 6rem; max-width: 1200px; }
+.mani {
+  font-weight: 200; letter-spacing: -.01em;
+  font-size: clamp(1.5rem, 4.2vw, 3.25rem); line-height: 1.25;
+}
+.mani span { color: var(--sand); }
+
+/* ── Estudio ─────────────────────────────────────────────── */
+.estudio { background: var(--paper); border-bottom: 1px solid var(--sand); }
+.estudio .g12 { row-gap: 3rem; }
+.estudio .c-izq { grid-column: 1 / -1; }
+.estudio .c-der { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 1.5rem; }
+@media (min-width: 768px) {
+  .estudio .c-izq { grid-column: 1 / span 5; }
+  .estudio .c-der { grid-column: 7 / -1; }
+}
+.ficha { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; padding-top: 1rem; font-size: .875rem; }
+.ficha p + p { margin-top: .5rem; color: var(--ink); }
+
+/* ── Proceso: es una secuencia real, por eso va numerado ─── */
+.etapas { row-gap: 3rem; }
+.etapa { grid-column: 1 / -1; position: relative; padding-top: 1.5rem; }
+@media (min-width: 768px) { .etapa { grid-column: span 3; } }
+.regla { position: absolute; top: 0; left: 0; display: block; width: 100%; height: 1px; background: var(--ink); transform-origin: left; }
+.etapa h3 { margin-top: .75rem; font-size: 1.25rem; font-weight: 300; color: var(--ink); }
+.etapa p.small { margin-top: .75rem; }
+
+/* ── Contacto ────────────────────────────────────────────── */
+.contacto { background: var(--ink); color: var(--paper); }
+.contacto .g12 { row-gap: 4rem; }
+.contacto .c-datos { grid-column: 1 / -1; }
+.contacto .c-form  { grid-column: 1 / -1; }
+@media (min-width: 1024px) {
+  .contacto .c-datos { grid-column: 1 / span 5; }
+  .contacto .c-form  { grid-column: 7 / -1; }
+}
+.contacto .h2, .contacto .display { color: var(--paper); }
+.contacto .eyebrow { color: var(--sand); }
+.datos { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; font-size: .875rem; }
+.datos .valor { margin-top: .5rem; display: inline-block; color: var(--paper); font-size: 1rem; }
+
+.campo + .campo { margin-top: 2rem; }
+.campo label { display: block; margin-bottom: .75rem; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--sand); }
+.campo input, .campo textarea, .campo select {
+  width: 100%; min-height: 44px; padding-block: .75rem;
+  background: transparent; color: var(--paper); font-size: 1rem;
+  border: 0; border-bottom: 1px solid rgba(214,213,210,.5);
+  transition: border-color var(--t-fast);
+}
+.campo select { background: var(--ink); cursor: pointer; }
+.campo textarea { resize: vertical; }
+.campo input:focus, .campo textarea:focus, .campo select:focus { outline: none; border-bottom-color: var(--paper); }
+.campo [aria-invalid="true"] { border-bottom-color: var(--alarm); }
+.ayuda { margin-top: .5rem; font-size: .875rem; color: var(--sand); }
+.error { display: none; margin-top: .5rem; font-size: .875rem; color: var(--alarm); }
+.error.visible { display: block; }
+form .btn { margin-top: 2rem; }
+#form-estado { margin-top: 1rem; font-size: .875rem; color: var(--sand); }
+
+/* ── Pie ─────────────────────────────────────────────────── */
+.pie { background: var(--ink); color: var(--sand); border-top: 1px solid rgba(255,255,255,.1); }
+.pie-fila {
+  padding-block: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem;
+  font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+}
+@media (min-width: 768px) { .pie-fila { flex-direction: row; align-items: center; justify-content: space-between; } }
+.pie-fila ul { display: flex; flex-wrap: wrap; gap: .75rem 2rem; }
+.pie-fila a { display: inline-block; padding-block: .5rem; }
+
+/* ── Preloader ───────────────────────────────────────────── */
+#preloader {
+  display: none; position: fixed; inset: 0; z-index: 70;
+  background: var(--ink); color: var(--paper);
+  align-items: flex-end; justify-content: space-between;
+  padding: 0 var(--pad) 2.5rem;
+}
+#contador { font-weight: 200; line-height: 1; font-size: clamp(3rem, 14vw, 10rem); font-variant-numeric: tabular-nums; }
+
+/* ── Cursor propio: adorno, nunca información ────────────── */
+#cursor, #cursor-ring {
+  position: fixed; top: 0; left: 0; z-index: 60; pointer-events: none;
+  border-radius: 9999px; mix-blend-mode: difference; opacity: 0;
+}
+#cursor      { width: 6px;  height: 6px;  background: #FFF; margin: -3px 0 0 -3px; }
+#cursor-ring { width: 40px; height: 40px; border: 1px solid #FFF; margin: -20px 0 0 -20px; }
+@media (hover: none), (pointer: coarse) { #cursor, #cursor-ring { display: none; } }
+.quieto #cursor, .quieto #cursor-ring, .quieto #preloader { display: none !important; }
+
+/* ── Estado inicial de lo animado ────────────────────────────
+   Solo se aplica con JS activo y movimiento permitido: si el JS
+   falla, la página se ve entera. Nunca hay contenido invisible. */
+.js:not(.quieto) .reveal  { opacity: 0; }
+.js:not(.quieto) .mask-in { opacity: 0; }
+.js:not(.quieto) .clip-in { clip-path: inset(0 0 100% 0); }
+.js:not(.quieto) #preloader { display: flex; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .mask-in { opacity: 1 !important; }
+  .clip-in { clip-path: none !important; }
+  #preloader, #cursor, #cursor-ring { display: none !important; }
+}
+</style>
+
+<script>
+  document.documentElement.classList.add('js');
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('quieto');
+  }
+</script>
+
+<div id="cursor" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+
+<div id="preloader" role="status" aria-live="polite">
+  <p class="eyebrow" style="color:var(--sand)">Marina Olivares — Arquitectura</p>
+  <p id="contador" aria-label="Cargando">00</p>
+</div>
+
+<a href="#contenido" class="sr saltar">Saltar al contenido</a>
+
+<header class="nav" id="nav">
+  <nav aria-label="Principal" class="wrap">
+    <div class="nav-fila">
+      <a href="#inicio" class="marca sub">Marina&nbsp;Olivares</a>
+      <ul class="nav-links">
+        <li><a href="#proyectos" class="sub roll">Proyectos</a></li>
+        <li><a href="#estudio"   class="sub roll">Estudio</a></li>
+        <li><a href="#proceso"   class="sub roll">Proceso</a></li>
+        <li><a href="#contacto"  class="sub roll">Contacto</a></li>
+      </ul>
+      <button id="menu-btn" type="button" class="hamb" aria-expanded="false" aria-controls="menu-movil" aria-label="Abrir menú de navegación">
+        <svg id="icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M3 7h18M3 12h18M3 17h18" stroke-linecap="round"/>
+        </svg>
+        <svg id="icon-close" style="display:none" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+  <div id="menu-movil" class="menu-movil">
+    <ul class="wrap">
+      <li><a href="#proyectos">Proyectos</a></li>
+      <li><a href="#estudio">Estudio</a></li>
+      <li><a href="#proceso">Proceso</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="contenido">
+
+  <section id="inicio" class="hero">
+    <div class="hero-fondo" aria-hidden="true">
+      <div id="parallax">
+        <svg id="plano" viewBox="0 0 600 620" fill="none">
+          <rect class="tr" x="90"  y="150" width="300" height="400" stroke="#D6D5D2" stroke-width="1.2"/>
+          <rect class="tr" x="150" y="230" width="180" height="240" stroke="#D6D5D2" stroke-width="1.2"/>
+          <path class="tr" d="M90 150 L240 60 L390 150" stroke="#D6D5D2" stroke-width="1.2"/>
+          <path class="tr" d="M390 150 L520 235 L520 550 L390 550" stroke="#D6D5D2" stroke-width="1.2"/>
+          <line class="tr" x1="240" y1="60"  x2="240" y2="550" stroke="#D6D5D2" stroke-width="1.2"/>
+          <line class="tr" x1="40"  y1="550" x2="560" y2="550" stroke="#111111" stroke-width="1.2"/>
+          <circle cx="240" cy="60" r="4" fill="#D6D5D2"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="g12">
+        <p class="eyebrow mask-in c-eyebrow">Estudio de arquitectura · Santiago de Chile</p>
+        <h1 class="display" data-split>Espacio, luz y materia</h1>
+        <p class="lead mask-in c-lead">
+          Proyectamos casas, equipamiento público y rehabilitaciones donde la
+          construcción se lee con claridad. Doce años de obra entre la cordillera
+          y el litoral.
+        </p>
+        <div class="mask-in c-cta">
+          <a href="#proyectos" id="cta-iman" class="btn">
+            Ver proyectos
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a href="#contacto" class="enlace-simple sub">Conversemos un encargo</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="indicador" aria-hidden="true">
+      Scroll
+      <span class="riel"><span id="linea-scroll"></span></span>
+    </div>
+  </section>
+
+  <section class="tira" aria-label="Ámbitos de trabajo">
+    <div class="tira-pista" id="marquesina">
+      <div class="tira-grupo">
+        <span>Vivienda unifamiliar</span><span class="punto">◦</span>
+        <span>Equipamiento público</span><span class="punto">◦</span>
+        <span>Rehabilitación</span><span class="punto">◦</span>
+        <span>Interiorismo</span><span class="punto">◦</span>
+        <span>Dirección de obra</span><span class="punto">◦</span>
+      </div>
+      <div class="tira-grupo" aria-hidden="true">
+        <span>Vivienda unifamiliar</span><span class="punto">◦</span>
+        <span>Equipamiento público</span><span class="punto">◦</span>
+        <span>Rehabilitación</span><span class="punto">◦</span>
+        <span>Interiorismo</span><span class="punto">◦</span>
+        <span>Dirección de obra</span><span class="punto">◦</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="cifras" aria-label="El estudio en cifras">
+    <div class="wrap">
+      <dl>
+        <div class="cifra reveal">
+          <dt class="eyebrow">Fundado</dt>
+          <dd><span data-num="2013" data-plano>2013</span></dd>
+        </div>
+        <div class="cifra reveal">
+          <dt class="eyebrow">Obras entregadas</dt>
+          <dd><span data-num="64">64</span></dd>
+        </div>
+        <div class="cifra reveal">
+          <dt class="eyebrow">m² construidos</dt>
+          <dd><span data-num="38400">38.400</span></dd>
+        </div>
+        <div class="cifra reveal">
+          <dt class="eyebrow">Distinciones</dt>
+          <dd><span data-num="9" data-cero>09</span></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section id="proyectos" class="seccion">
+    <div class="wrap">
+
+      <div class="g12 cabecera">
+        <div class="c-titulo">
+          <p class="eyebrow reveal">Obra</p>
+          <h2 class="h2" data-split style="margin-top:1rem">Proyectos seleccionados</h2>
+        </div>
+        <p class="small reveal c-nota">Una selección de obra construida entre 2021 y 2025.</p>
+      </div>
+
+      <div class="filtros reveal" role="group" aria-label="Filtrar proyectos por categoría">
+        <button type="button" class="filtro" data-filtro="todos" aria-pressed="true">Todos</button>
+        <button type="button" class="filtro" data-filtro="residencial" aria-pressed="false">Residencial</button>
+        <button type="button" class="filtro" data-filtro="cultural" aria-pressed="false">Cultural</button>
+        <button type="button" class="filtro" data-filtro="comercial" aria-pressed="false">Comercial</button>
+        <button type="button" class="filtro" data-filtro="interiorismo" aria-pressed="false">Interiorismo</button>
+      </div>
+
+      <p id="filtro-estado" class="sr" role="status" aria-live="polite"></p>
+
+      <div class="g12 grilla" id="grilla">
+
+        <article class="card w7" data-cat="residencial">
+          <a href="#">
+            <div class="marco r43 clip-in">
+              <svg class="shot" viewBox="0 0 800 600" role="img" aria-label="Casa Ladera: fachada poniente en hormigón y madera">
+                <rect width="800" height="600" fill="#F4F4F4"/>
+                <rect x="120" y="180" width="560" height="300" fill="#E6E4E0"/>
+                <rect x="120" y="180" width="560" height="300" stroke="#D6D5D2" fill="none"/>
+                <rect x="180" y="240" width="150" height="180" fill="#F0EFEB"/>
+                <rect x="380" y="240" width="240" height="90" fill="#F0EFEB"/>
+                <rect x="380" y="360" width="240" height="60" fill="#D6D5D2"/>
+                <path d="M120 180 L400 90 L680 180" stroke="#111111" fill="none" stroke-width="1.5"/>
+                <line x1="60" y1="480" x2="740" y2="480" stroke="#111111" stroke-width="1.5"/>
+                <line x1="400" y1="90" x2="400" y2="480" stroke="#D6D5D2"/>
+              </svg>
+            </div>
+            <div class="pie-card">
+              <div>
+                <h3>Casa Ladera</h3>
+                <p class="meta">Residencial · Farellones · 2024</p>
+                <p class="leer">Ver ficha →</p>
+              </div>
+              <span class="num">01</span>
+            </div>
+          </a>
+        </article>
+
+        <article class="card w5 d24" data-cat="cultural">
+          <a href="#">
+            <div class="marco r34 clip-in">
+              <svg class="shot" viewBox="0 0 600 800" role="img" aria-label="Pabellón Lumen: sección transversal con luz cenital">
+                <rect width="600" height="800" fill="#F4F4F4"/>
+                <rect x="90" y="200" width="420" height="440" fill="#EAE8E4"/>
+                <rect x="90" y="200" width="420" height="440" stroke="#D6D5D2" fill="none"/>
+                <path d="M150 200 L150 120 L450 120 L450 200" stroke="#111111" fill="none" stroke-width="1.5"/>
+                <line x1="200" y1="120" x2="200" y2="640" stroke="#D6D5D2"/>
+                <line x1="300" y1="120" x2="300" y2="640" stroke="#D6D5D2"/>
+                <line x1="400" y1="120" x2="400" y2="640" stroke="#D6D5D2"/>
+                <path d="M180 140 L240 640" stroke="#FFFFFF" stroke-width="18" opacity=".85"/>
+                <path d="M420 140 L360 640" stroke="#FFFFFF" stroke-width="18" opacity=".85"/>
+                <line x1="50" y1="640" x2="550" y2="640" stroke="#111111" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="pie-card">
+              <div>
+                <h3>Pabellón Lumen</h3>
+                <p class="meta">Cultural · Valparaíso · 2023</p>
+                <p class="leer">Ver ficha →</p>
+              </div>
+              <span class="num">02</span>
+            </div>
+          </a>
+        </article>
+
+        <article class="card w5" data-cat="residencial">
+          <a href="#">
+            <div class="marco r34 clip-in">
+              <svg class="shot" viewBox="0 0 600 800" role="img" aria-label="Refugio Andino: volumen compacto de piedra sobre la ladera">
+                <rect width="600" height="800" fill="#F4F4F4"/>
+                <path d="M60 620 L200 470 L400 560 L540 430 L540 620 Z" fill="#EAE8E4"/>
+                <rect x="220" y="330" width="200" height="240" fill="#E0DED9"/>
+                <rect x="220" y="330" width="200" height="240" stroke="#111111" fill="none" stroke-width="1.5"/>
+                <path d="M220 330 L320 250 L420 330" stroke="#111111" fill="none" stroke-width="1.5"/>
+                <rect x="265" y="400" width="50" height="80" fill="#F0EFEB"/>
+                <rect x="340" y="400" width="50" height="80" fill="#F0EFEB"/>
+                <line x1="40" y1="620" x2="560" y2="620" stroke="#111111" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="pie-card">
+              <div>
+                <h3>Refugio Andino</h3>
+                <p class="meta">Residencial · Cajón del Maipo · 2023</p>
+                <p class="leer">Ver ficha →</p>
+              </div>
+              <span class="num">03</span>
+            </div>
+          </a>
+        </article>
+
+        <article class="card w7 d20" data-cat="comercial">
+          <a href="#">
+            <div class="marco r43 clip-in">
+              <svg class="shot" viewBox="0 0 800 600" role="img" aria-label="Mercado Central: planta de cubierta y estructura reticulada">
+                <rect width="800" height="600" fill="#F4F4F4"/>
+                <rect x="90" y="120" width="620" height="360" fill="#EAE8E4"/>
+                <rect x="90" y="120" width="620" height="360" stroke="#111111" fill="none" stroke-width="1.5"/>
+                <g stroke="#D6D5D2">
+                  <line x1="90" y1="210" x2="710" y2="210"/><line x1="90" y1="300" x2="710" y2="300"/>
+                  <line x1="90" y1="390" x2="710" y2="390"/>
+                  <line x1="245" y1="120" x2="245" y2="480"/><line x1="400" y1="120" x2="400" y2="480"/>
+                  <line x1="555" y1="120" x2="555" y2="480"/>
+                </g>
+                <g fill="#D6D5D2">
+                  <circle cx="245" cy="210" r="7"/><circle cx="400" cy="210" r="7"/><circle cx="555" cy="210" r="7"/>
+                  <circle cx="245" cy="390" r="7"/><circle cx="400" cy="390" r="7"/><circle cx="555" cy="390" r="7"/>
+                </g>
+                <rect x="330" y="255" width="140" height="90" fill="#F0EFEB" stroke="#111111"/>
+              </svg>
+            </div>
+            <div class="pie-card">
+              <div>
+                <h3>Mercado Central</h3>
+                <p class="meta">Comercial · Rancagua · 2022</p>
+                <p class="leer">Ver ficha →</p>
+              </div>
+              <span class="num">04</span>
+            </div>
+          </a>
+        </article>
+
+        <article class="card w6" data-cat="interiorismo">
+          <a href="#">
+            <div class="marco r11 clip-in">
+              <svg class="shot" viewBox="0 0 600 600" role="img" aria-label="Silo: interior rehabilitado con escalera helicoidal">
+                <rect width="600" height="600" fill="#F4F4F4"/>
+                <circle cx="300" cy="300" r="200" fill="#EAE8E4"/>
+                <circle cx="300" cy="300" r="200" stroke="#111111" fill="none" stroke-width="1.5"/>
+                <circle cx="300" cy="300" r="130" stroke="#D6D5D2" fill="none"/>
+                <circle cx="300" cy="300" r="60" stroke="#D6D5D2" fill="none"/>
+                <path d="M300 100 A200 200 0 0 1 470 380" stroke="#111111" fill="none" stroke-width="1.5"/>
+                <line x1="300" y1="300" x2="300" y2="100" stroke="#D6D5D2"/>
+                <line x1="300" y1="300" x2="470" y2="380" stroke="#D6D5D2"/>
+                <circle cx="300" cy="300" r="8" fill="#111111"/>
+              </svg>
+            </div>
+            <div class="pie-card">
+              <div>
+                <h3>Silo</h3>
+                <p class="meta">Interiorismo · Talca · 2021</p>
+                <p class="leer">Ver ficha →</p>
+              </div>
+              <span class="num">05</span>
+            </div>
+          </a>
+        </article>
+
+        <article class="card w6 d16" data-cat="cultural">
+          <a href="#">
+            <div class="marco r11 clip-in">
+              <svg class="shot" viewBox="0 0 600 600" role="img" aria-label="Biblioteca del Río: alzado con celosía de hormigón">
+                <rect width="600" height="600" fill="#F4F4F4"/>
+                <rect x="80" y="140" width="440" height="320" fill="#EAE8E4"/>
+                <rect x="80" y="140" width="440" height="320" stroke="#111111" fill="none" stroke-width="1.5"/>
+                <g fill="#F0EFEB">
+                  <rect x="120" y="180" width="60" height="60"/><rect x="210" y="180" width="60" height="60"/>
+                  <rect x="300" y="180" width="60" height="60"/><rect x="390" y="180" width="60" height="60"/>
+                  <rect x="120" y="270" width="60" height="60"/><rect x="210" y="270" width="60" height="60"/>
+                  <rect x="300" y="270" width="60" height="60"/><rect x="390" y="270" width="60" height="60"/>
+                  <rect x="120" y="360" width="60" height="60"/><rect x="210" y="360" width="60" height="60"/>
+                </g>
+                <rect x="300" y="360" width="150" height="100" fill="#D6D5D2"/>
+                <line x1="40" y1="460" x2="560" y2="460" stroke="#111111" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <div class="pie-card">
+              <div>
+                <h3>Biblioteca del Río</h3>
+                <p class="meta">Cultural · Valdivia · 2025</p>
+                <p class="leer">Ver ficha →</p>
+              </div>
+              <span class="num">06</span>
+            </div>
+          </a>
+        </article>
+
+      </div>
+
+      <p class="vacio" id="sin-resultados">No hay proyectos en esta categoría todavía.</p>
+    </div>
+  </section>
+
+  <section id="manifiesto" class="manifiesto oscuro">
+    <div id="foco" aria-hidden="true"></div>
+    <div class="wrap caja">
+      <p class="mani">
+        No perseguimos la forma. Buscamos que cada decisión —una viga vista, un
+        quiebre de muro, la orientación de un vano— resuelva más de un problema
+        a la vez.
+      </p>
+    </div>
+  </section>
+
+  <section id="estudio" class="seccion estudio">
+    <div class="wrap">
+      <div class="g12">
+        <div class="c-izq">
+          <p class="eyebrow reveal">Estudio</p>
+          <h2 class="h2" data-split style="margin-top:1rem">Construir con pocos gestos</h2>
+        </div>
+        <div class="c-der">
+          <p class="lead reveal" style="max-width:56ch">
+            El estudio trabaja desde 2013 en encargos donde el presupuesto y el
+            lugar imponen sus propias reglas. Dirigimos obra directamente: menos
+            proyectos por año y control real sobre lo que se construye, incluidos
+            los detalles que nunca aparecen en las fotografías.
+          </p>
+          <div class="ficha reveal">
+            <div>
+              <p class="eyebrow">Dirección</p>
+              <p>Marina Olivares<br>Arquitecta, PUC</p>
+            </div>
+            <div>
+              <p class="eyebrow">Equipo</p>
+              <p>7 personas<br>Santiago · Valdivia</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="proceso" class="seccion">
+    <div class="wrap">
+      <p class="eyebrow reveal">Proceso</p>
+      <h2 class="h2" data-split style="margin:1rem 0 4rem">Cómo trabajamos</h2>
+
+      <!-- Numerado porque el orden es real: no se dibuja antes de visitar,
+           ni se ejecuta antes de elegir partido. -->
+      <ol class="g12 etapas" id="etapas">
+        <li class="etapa">
+          <span class="regla"></span>
+          <p class="eyebrow">Etapa 01</p>
+          <h3>Lugar</h3>
+          <p class="small">Visita, levantamiento y estudio de asoleamiento. Antes de dibujar, entender qué pide el terreno.</p>
+        </li>
+        <li class="etapa">
+          <span class="regla"></span>
+          <p class="eyebrow">Etapa 02</p>
+          <h3>Anteproyecto</h3>
+          <p class="small">Dos o tres partidos distintos, en maqueta física. Se elige uno y se descarta el resto sin nostalgia.</p>
+        </li>
+        <li class="etapa">
+          <span class="regla"></span>
+          <p class="eyebrow">Etapa 03</p>
+          <h3>Proyecto</h3>
+          <p class="small">Planimetría de ejecución, especificaciones y coordinación con cálculo e instalaciones.</p>
+        </li>
+        <li class="etapa">
+          <span class="regla"></span>
+          <p class="eyebrow">Etapa 04</p>
+          <h3>Obra</h3>
+          <p class="small">Inspección semanal en terreno hasta la recepción municipal. Sin intermediarios.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="contacto" class="seccion contacto oscuro">
+    <div class="wrap">
+      <div class="g12">
+
+        <div class="c-datos">
+          <p class="eyebrow reveal">Contacto</p>
+          <h2 class="h2" data-split style="margin-top:1rem">Cuéntenos su encargo</h2>
+          <div class="datos reveal">
+            <div>
+              <p class="eyebrow">Correo</p>
+              <a href="mailto:hola@marinaolivares.cl" class="valor sub">hola@marinaolivares.cl</a>
+            </div>
+            <div>
+              <p class="eyebrow">Teléfono</p>
+              <a href="tel:+56221234567" class="valor sub">+56 2 2123 4567</a>
+            </div>
+            <div>
+              <p class="eyebrow">Oficina</p>
+              <p class="valor">Av. Italia 1450, Providencia<br>Santiago de Chile</p>
+            </div>
+          </div>
+        </div>
+
+        <form id="form" class="c-form reveal" novalidate>
+          <div class="campo">
+            <label for="nombre">Nombre <span aria-hidden="true">*</span></label>
+            <input id="nombre" name="nombre" type="text" required autocomplete="name" aria-describedby="nombre-error">
+            <p class="error" id="nombre-error"></p>
+          </div>
+          <div class="campo">
+            <label for="email">Correo <span aria-hidden="true">*</span></label>
+            <input id="email" name="email" type="email" required autocomplete="email" aria-describedby="email-ayuda email-error">
+            <p class="ayuda" id="email-ayuda">Le respondemos dentro de dos días hábiles.</p>
+            <p class="error" id="email-error"></p>
+          </div>
+          <div class="campo">
+            <label for="tipo">Tipo de encargo</label>
+            <select id="tipo" name="tipo">
+              <option value="">Seleccione una opción</option>
+              <option value="vivienda">Vivienda unifamiliar</option>
+              <option value="rehabilitacion">Rehabilitación</option>
+              <option value="interiorismo">Interiorismo</option>
+              <option value="publico">Equipamiento público</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="mensaje">Mensaje <span aria-hidden="true">*</span></label>
+            <textarea id="mensaje" name="mensaje" rows="4" required aria-describedby="mensaje-error"></textarea>
+            <p class="error" id="mensaje-error"></p>
+          </div>
+
+          <button type="submit" class="btn claro">
+            Enviar consulta
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <p id="form-estado" role="status" aria-live="polite"></p>
+        </form>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pie oscuro">
+  <div class="wrap pie-fila">
+    <p>© 2026 Marina Olivares Arquitectura</p>
+    <ul>
+      <li><a href="#" class="sub">Instagram</a></li>
+      <li><a href="#" class="sub">LinkedIn</a></li>
+      <li><a href="#" class="sub">Aviso legal</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>/*GSAP*/</script>
+<script>/*ST*/</script>
+<script>
+(function () {
+  'use strict';
+
+  var quieto = document.documentElement.classList.contains('quieto');
+  var hayGsap = typeof window.gsap !== 'undefined';
+
+  if (!hayGsap || quieto) {
+    document.documentElement.classList.remove('js');
+    var pre = document.getElementById('preloader');
+    if (pre) pre.remove();
+  } else {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
+  /* Parte el texto en LETRAS para animarlas una a una.
+     La accesibilidad se resuelve en dos movimientos: el elemento
+     recibe aria-label con la frase completa, y cada palabra queda
+     con aria-hidden. El lector de pantalla lee la frase entera y
+     nunca se topa con las letras sueltas. */
+  function partirLetras(el) {
+    var texto = el.textContent.trim();
+    var palabras = texto.split(/\s+/);
+    el.setAttribute('aria-label', texto);
+    el.textContent = '';
+    palabras.forEach(function (palabra, i) {
+      var caja = document.createElement('span');
+      caja.className = 'pal';
+      caja.setAttribute('aria-hidden', 'true');
+      palabra.split('').forEach(function (car) {
+        var l = document.createElement('span');
+        l.className = 'ltr';
+        l.textContent = car;
+        caja.appendChild(l);
+      });
+      el.appendChild(caja);
+      if (i < palabras.length - 1) el.appendChild(document.createTextNode(' '));
+    });
+    return el.querySelectorAll('.ltr');
+  }
+
+  function entrada() {
+    var h1 = document.querySelector('#inicio [data-split]');
+    var letras = h1 ? partirLetras(h1) : [];
+    var pre = document.getElementById('preloader');
+    var tl = gsap.timeline();
+
+    if (pre) {
+      var n = { v: 0 };
+      tl.to(n, {
+        v: 100, duration: 1.1, ease: 'power2.inOut',
+        onUpdate: function () {
+          document.getElementById('contador').textContent = String(Math.round(n.v)).padStart(2, '0');
+        }
+      })
+      .to(pre, { yPercent: -100, duration: .8, ease: 'expo.inOut' }, '+=0.15')
+      .set(pre, { display: 'none' });
+    }
+
+    /* Cada letra cae desde atrás, girando sobre su propia base */
+    tl.from(letras, {
+        yPercent: 120, rotateX: -75, opacity: 0,
+        duration: .85, stagger: .022, ease: 'expo.out'
+      }, pre ? '-=0.45' : 0)
+      .fromTo('#inicio .mask-in',
+        { opacity: 0, y: 22 },
+        { opacity: 1, y: 0, duration: .7, stagger: .09, ease: 'power2.out' }, '-=0.55');
+  }
+
+  function escenas() {
+    /* Trazo dibujándose con stroke-dashoffset nativo (sin el plugin DrawSVG, de pago) */
+    document.querySelectorAll('#plano .tr').forEach(function (t) {
+      try {
+        var largo = t.getTotalLength ? t.getTotalLength() : 0;
+        if (largo) { t.style.strokeDasharray = largo; t.style.strokeDashoffset = largo; }
+      } catch (e) {}
+    });
+    gsap.to('#plano .tr', { strokeDashoffset: 0, duration: 1.6, stagger: .08, ease: 'power2.out', delay: .6 });
+
+    document.querySelectorAll('main [data-split]').forEach(function (h) {
+      if (h.closest('#inicio')) return;
+      gsap.from(partirLetras(h), {
+        yPercent: 120, rotateX: -75, opacity: 0,
+        duration: .75, stagger: .016, ease: 'expo.out',
+        scrollTrigger: { trigger: h, start: 'top 88%' }
+      });
+    });
+
+    gsap.utils.toArray('.reveal').forEach(function (el) {
+      gsap.fromTo(el, { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: .6, ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 90%' } });
+    });
+
+    gsap.utils.toArray('.clip-in').forEach(function (marco) {
+      gsap.to(marco, {
+        clipPath: 'inset(0 0 0% 0)', duration: 1.1, ease: 'expo.out',
+        scrollTrigger: { trigger: marco, start: 'top 85%' }
+      });
+      var img = marco.querySelector('.shot');
+      if (img) {
+        gsap.fromTo(img, { yPercent: -5 }, {
+          yPercent: 5, ease: 'none',
+          scrollTrigger: { trigger: marco, start: 'top bottom', end: 'bottom top', scrub: .6 }
+        });
+      }
+    });
+
+    gsap.utils.toArray('[data-num]').forEach(function (el) {
+      var meta = parseFloat(el.dataset.num);
+      var cero = el.hasAttribute('data-cero');
+      var plano = el.hasAttribute('data-plano');
+      var o = { v: 0 };
+      gsap.to(o, {
+        v: meta, duration: 1.6, ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 92%' },
+        onUpdate: function () {
+          var n = Math.round(o.v);
+          el.textContent = plano ? String(n) : cero ? String(n).padStart(2, '0') : n.toLocaleString('es-CL');
+        }
+      });
+    });
+
+    /* La tira reacciona al scroll: acelera al bajar, invierte al subir */
+    var marq = document.getElementById('marquesina');
+    if (marq) {
+      var cinta = gsap.to(marq, { xPercent: -50, duration: 26, ease: 'none', repeat: -1 });
+      var rumbo = 1;
+      var calmar = gsap.delayedCall(.4, function () {
+        gsap.to(cinta, { timeScale: rumbo, duration: .8, ease: 'power2.out', overwrite: true });
+      }).pause();
+
+      ScrollTrigger.create({
+        onUpdate: function (self) {
+          var v = self.getVelocity();
+          rumbo = v < 0 ? -1 : 1;
+          /* Un solo tween manda sobre timeScale; el reposo se reprograma
+             en cada scroll para que no compitan dos animaciones. */
+          gsap.to(cinta, {
+            timeScale: gsap.utils.clamp(-7, 7, v / 260 || rumbo),
+            duration: .25, ease: 'power2.out', overwrite: true
+          });
+          calmar.restart(true);
+        }
+      });
+    }
+
+    /* Única sección anclada de la página: más de una pelea con el scroll nativo */
+    var mani = document.querySelector('.mani');
+    if (mani) {
+      var texto = mani.textContent.trim();
+      mani.textContent = '';
+      texto.split(/\s+/).forEach(function (p) {
+        var s = document.createElement('span');
+        s.textContent = p + ' ';
+        mani.appendChild(s);
+      });
+      gsap.to('.mani span', {
+        color: '#FFFFFF', stagger: .5, ease: 'none',
+        scrollTrigger: { trigger: '#manifiesto', start: 'top top', end: '+=140%', scrub: .8, pin: true }
+      });
+    }
+
+    gsap.from('#etapas .regla', {
+      scaleX: 0, duration: .9, stagger: .12, ease: 'power3.out',
+      scrollTrigger: { trigger: '#etapas', start: 'top 85%' }
+    });
+    gsap.from('#etapas .etapa > *:not(.regla)', {
+      opacity: 0, y: 18, duration: .5, stagger: .05, ease: 'power2.out',
+      scrollTrigger: { trigger: '#etapas', start: 'top 85%' }
+    });
+
+    gsap.fromTo('#linea-scroll', { xPercent: -100 }, {
+      xPercent: 0, ease: 'none',
+      scrollTrigger: { trigger: '#inicio', start: 'top top', end: 'bottom top', scrub: true }
+    });
+
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { ScrollTrigger.refresh(); });
+    window.addEventListener('load', function () { ScrollTrigger.refresh(); });
+  }
+
+  function punteroFino() {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    var punto = document.getElementById('cursor');
+    var aro = document.getElementById('cursor-ring');
+    gsap.set([punto, aro], { opacity: 1 });
+
+    var px = gsap.quickTo(punto, 'x', { duration: .12, ease: 'power3' });
+    var py = gsap.quickTo(punto, 'y', { duration: .12, ease: 'power3' });
+    var ax = gsap.quickTo(aro, 'x', { duration: .5, ease: 'power3' });
+    var ay = gsap.quickTo(aro, 'y', { duration: .5, ease: 'power3' });
+
+    window.addEventListener('mousemove', function (e) {
+      px(e.clientX); py(e.clientY); ax(e.clientX); ay(e.clientY);
+    }, { passive: true });
+
+    document.querySelectorAll('a, button').forEach(function (el) {
+      el.addEventListener('mouseenter', function () { gsap.to(aro, { scale: 1.7, duration: .3 }); });
+      el.addEventListener('mouseleave', function () { gsap.to(aro, { scale: 1, duration: .3 }); });
+    });
+
+    /* Un solo elemento magnético, con tirón limitado al 30% del radio */
+    var iman = document.getElementById('cta-iman');
+    if (iman) {
+      var ix = gsap.quickTo(iman, 'x', { duration: .4, ease: 'elastic.out(1,0.4)' });
+      var iy = gsap.quickTo(iman, 'y', { duration: .4, ease: 'elastic.out(1,0.4)' });
+      iman.addEventListener('mousemove', function (e) {
+        var r = iman.getBoundingClientRect();
+        ix((e.clientX - r.left - r.width / 2) * .3);
+        iy((e.clientY - r.top - r.height / 2) * .3);
+      });
+      iman.addEventListener('mouseleave', function () { ix(0); iy(0); });
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     Movimiento gobernado por el cursor.
+     Todo aquí exige puntero fino: en táctil no existe "pasar por
+     encima", y dejarlo activo solo produce estados atascados.
+     ══════════════════════════════════════════════════════════ */
+  function interacciones() {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+
+    /* ── 1. Letras del hero que se levantan al acercarse el cursor ──
+       Las medidas se cachean: leer getBoundingClientRect de 20 letras
+       en cada mousemove fuerza recálculo de layout y provoca tirones. */
+    var letras = Array.prototype.slice.call(document.querySelectorAll('#inicio .ltr'));
+    if (letras.length) {
+      var campos = letras.map(function (l) {
+        return {
+          el: l,
+          y: gsap.quickTo(l, 'y', { duration: .5, ease: 'power3' }),
+          s: gsap.quickTo(l, 'scale', { duration: .5, ease: 'power3' }),
+          cx: 0, cy: 0
+        };
+      });
+
+      var medir = function () {
+        campos.forEach(function (c) {
+          var r = c.el.getBoundingClientRect();
+          c.cx = r.left + r.width / 2;
+          c.cy = r.top + r.height / 2;
+        });
+      };
+      medir();
+      window.addEventListener('resize', medir);
+      window.addEventListener('scroll', medir, { passive: true });
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(medir);
+      /* Las letras se mueven durante la entrada: hay que volver a medir al final */
+      gsap.delayedCall(2.8, medir);
+
+      var RADIO = 170;
+      window.addEventListener('mousemove', function (e) {
+        campos.forEach(function (c) {
+          var dx = e.clientX - c.cx, dy = e.clientY - c.cy;
+          var f = 1 - Math.min(1, Math.sqrt(dx * dx + dy * dy) / RADIO);
+          if (f <= 0) { c.y(0); c.s(1); return; }
+          c.y(-22 * f);
+          c.s(1 + .22 * f);
+        });
+      }, { passive: true });
+    }
+
+    /* ── 2. Onda de letras en los enlaces de navegación ── */
+    document.querySelectorAll('.roll').forEach(function (a) {
+      var txt = a.textContent.trim();
+      a.setAttribute('aria-label', txt);
+      a.textContent = '';
+      var caja = document.createElement('span');
+      caja.setAttribute('aria-hidden', 'true');
+      txt.split('').forEach(function (car) {
+        var l = document.createElement('span');
+        l.className = 'ltr';
+        l.textContent = car;
+        caja.appendChild(l);
+      });
+      a.appendChild(caja);
+      var ls = a.querySelectorAll('.ltr');
+      a.addEventListener('mouseenter', function () {
+        gsap.fromTo(ls, { y: 0 },
+          { y: -5, duration: .22, ease: 'power2.out', stagger: .025, yoyo: true, repeat: 1, overwrite: true });
+      });
+    });
+
+    /* ── 3. Tarjetas que se inclinan hacia el cursor ──
+       Inclinación máxima de 7°: más que eso deforma el dibujo
+       y delata que es un truco. */
+    document.querySelectorAll('#grilla .card').forEach(function (card) {
+      var marco = card.querySelector('.marco');
+      if (!marco) return;
+      var rx = gsap.quickTo(marco, 'rotationX', { duration: .6, ease: 'power3' });
+      var ry = gsap.quickTo(marco, 'rotationY', { duration: .6, ease: 'power3' });
+      card.addEventListener('mousemove', function (e) {
+        var r = card.getBoundingClientRect();
+        rx(((e.clientY - r.top) / r.height - .5) * -7);
+        ry(((e.clientX - r.left) / r.width - .5) * 7);
+      });
+      card.addEventListener('mouseleave', function () { rx(0); ry(0); });
+    });
+
+    /* ── 4. El plano del hero flota en sentido contrario al cursor ──
+       Va en #plano, no en #parallax: así el movimiento de scroll y el
+       del mouse viven en elementos distintos y no se pisan. */
+    var plano = document.getElementById('plano');
+    if (plano) {
+      var mx = gsap.quickTo(plano, 'x', { duration: 1.2, ease: 'power3' });
+      var my = gsap.quickTo(plano, 'y', { duration: 1.2, ease: 'power3' });
+      window.addEventListener('mousemove', function (e) {
+        mx((e.clientX / window.innerWidth - .5) * -46);
+        my((e.clientY / window.innerHeight - .5) * -30);
+      }, { passive: true });
+    }
+
+    /* ── 5. Foco de luz sobre el manifiesto ── */
+    var mani = document.getElementById('manifiesto');
+    var foco = document.getElementById('foco');
+    if (mani && foco) {
+      mani.addEventListener('mouseenter', function () { foco.style.opacity = '1'; });
+      mani.addEventListener('mouseleave', function () { foco.style.opacity = '0'; });
+      mani.addEventListener('mousemove', function (e) {
+        var r = mani.getBoundingClientRect();
+        foco.style.setProperty('--fx', (e.clientX - r.left) + 'px');
+        foco.style.setProperty('--fy', (e.clientY - r.top) + 'px');
+      }, { passive: true });
+    }
+  }
+
+  if (hayGsap && !quieto) { entrada(); escenas(); punteroFino(); interacciones(); }
+
+  /* Barra: se esconde al bajar, reaparece al subir */
+  var nav = document.getElementById('nav');
+  var ultimo = 0;
+  window.addEventListener('scroll', function () {
+    var y = window.scrollY;
+    nav.classList.toggle('pegada', y > 40);
+    if (!quieto) nav.classList.toggle('oculta', y > ultimo && y > 200);
+    ultimo = y;
+  }, { passive: true });
+
+  /* Menú móvil */
+  var btn = document.getElementById('menu-btn');
+  var menu = document.getElementById('menu-movil');
+  var iOpen = document.getElementById('icon-open');
+  var iClose = document.getElementById('icon-close');
+
+  function alternar(forzarCerrado) {
+    var abierto = forzarCerrado ? false : !menu.classList.contains('abierto');
+    menu.classList.toggle('abierto', abierto);
+    iOpen.style.display = abierto ? 'none' : '';
+    iClose.style.display = abierto ? '' : 'none';
+    btn.setAttribute('aria-expanded', String(abierto));
+    btn.setAttribute('aria-label', abierto ? 'Cerrar menú de navegación' : 'Abrir menú de navegación');
+  }
+  btn.addEventListener('click', function () { alternar(false); });
+  menu.addEventListener('click', function (e) { if (e.target.tagName === 'A') alternar(true); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && menu.classList.contains('abierto')) { alternar(true); btn.focus(); }
+  });
+
+  /* Filtro */
+  var botones = document.querySelectorAll('.filtro');
+  var tarjetas = document.querySelectorAll('#grilla .card');
+  var estado = document.getElementById('filtro-estado');
+  var vacio = document.getElementById('sin-resultados');
+
+  botones.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var cat = b.dataset.filtro;
+      botones.forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+
+      var visibles = [];
+      tarjetas.forEach(function (t) {
+        var mostrar = cat === 'todos' || t.dataset.cat === cat;
+        t.classList.toggle('oculta', !mostrar);
+        if (mostrar) { t.removeAttribute('aria-hidden'); visibles.push(t); }
+        else { t.setAttribute('aria-hidden', 'true'); }
+      });
+
+      if (hayGsap && !quieto && visibles.length) {
+        gsap.fromTo(visibles, { opacity: 0, scale: .96, y: 16 },
+          { opacity: 1, scale: 1, y: 0, duration: .45, ease: 'back.out(1.4)',
+            stagger: { each: .06, from: 'start' },
+            onComplete: function () { ScrollTrigger.refresh(); } });
+      }
+
+      vacio.classList.toggle('visible', visibles.length === 0);
+      estado.textContent = visibles.length === 1 ? '1 proyecto visible.' : visibles.length + ' proyectos visibles.';
+    });
+  });
+
+  /* Formulario */
+  var form = document.getElementById('form');
+  var salida = document.getElementById('form-estado');
+
+  var reglas = {
+    nombre:  function (v) { return v.trim().length >= 2 || 'Indique su nombre.'; },
+    email:   function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) || 'Revise el correo: falta el @ o el dominio.'; },
+    mensaje: function (v) { return v.trim().length >= 10 || 'Cuéntenos algo más sobre el encargo (mínimo 10 caracteres).'; }
+  };
+
+  function validar(id) {
+    var campo = document.getElementById(id);
+    var error = document.getElementById(id + '-error');
+    var r = reglas[id](campo.value);
+    if (r === true) {
+      error.classList.remove('visible'); error.textContent = '';
+      campo.removeAttribute('aria-invalid');
+      return true;
+    }
+    error.textContent = r;
+    error.classList.add('visible');
+    campo.setAttribute('aria-invalid', 'true');
+    return false;
+  }
+
+  Object.keys(reglas).forEach(function (id) {
+    var c = document.getElementById(id);
+    c.addEventListener('blur', function () { validar(id); });
+    c.addEventListener('input', function () { if (c.getAttribute('aria-invalid')) validar(id); });
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var primero = null;
+    Object.keys(reglas).forEach(function (id) {
+      if (!validar(id) && !primero) primero = document.getElementById(id);
+    });
+    if (primero) { salida.textContent = 'Revise los campos marcados.'; primero.focus(); return; }
+    salida.textContent = 'Gracias. Hemos recibido su consulta y le responderemos pronto.';
+    form.reset();
+  });
+
+})();
+</script>

@@ -1,0 +1,22 @@
+# Dependencias — se reconstruyen con `npm install`
+node_modules/
+
+# Salida del build — se reconstruye con `npm run build`
+dist/
+
+# Herramientas locales de Claude Code. Incluye un repositorio ajeno clonado
+# dentro (la skill ui-ux-pro-max), que git trataria como submodulo roto.
+.claude/
+
+# Material de referencia ajeno.
+# El HTML de Pelizzari Studio es una copia guardada de su sitio: 13 MB de
+# contenido y fotografias de otro estudio. Sirve de referencia local, pero
+# publicarlo en un repositorio abierto seria redistribuir obra ajena.
+Pelizzari Studio*.html
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/

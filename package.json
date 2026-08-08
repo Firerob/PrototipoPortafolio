@@ -1,0 +1,30 @@
+{
+  "name": "portafolio-arquitectura",
+  "version": "1.0.0",
+  "description": "Portafolio de arquitectura — Marina Olivares",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 8931",
+    "typecheck": "tsc --noEmit",
+    "test": "node tests/funcional.mjs"
+  },
+  "type": "module",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "framer-motion": "^12.43.0",
+    "gsap": "^3.15.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.0.5",
+    "puppeteer-core": "^25.5.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1"
+  },
+  "private": true
+}
