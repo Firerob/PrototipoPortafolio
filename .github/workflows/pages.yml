@@ -1,0 +1,65 @@
+# Compila el sitio y lo publica en GitHub Pages en cada push a main.
+#
+# Requiere que Pages este activado con origen "GitHub Actions"
+# (Settings › Pages › Build and deployment › Source). El paso
+# `configure-pages` intenta activarlo solo con `enablement: true`; si la
+# organizacion no lo permite, hay que ponerlo a mano una vez.
+#
+# `npm test` no corre aqui: conduce un navegador real y busca Edge o Chrome
+# en rutas de Windows (tests/funcional.mjs). Se ejecuta en local antes de
+# subir. El typecheck y el build si son puerta de entrada: si alguno falla,
+# no se publica nada.
+name: Publicar en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Deja terminar un despliegue en curso antes de empezar otro, en vez de
+# cancelarlo a medias y dejar el sitio en un estado indeterminado.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Comprobar tipos
+        run: npm run typecheck
+
+      - name: Compilar
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  publicar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - id: despliegue
+        uses: actions/deploy-pages@v4
