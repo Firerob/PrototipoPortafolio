@@ -4,7 +4,7 @@ import { proyectos, categorias } from '../data/proyectos.js'
 import { useAparicion } from '../hooks/useAparicion.js'
 import Revelar from './Revelar.jsx'
 import { TituloPartido } from './Texto.jsx'
-import Dibujo from './Dibujos.jsx'
+import ImagenZoom from './ImagenZoom.jsx'
 import { useSinMovimiento } from '../hooks/useMovimiento.js'
 
 /** Tarjeta que se inclina hacia el cursor y descubre su dibujo con una cortina. */
@@ -18,15 +18,18 @@ function Tarjeta({ proyecto, indice }) {
   // llegaria a activarse jamas. La tarjeta no esta recortada, asi que si.
   const [refCortina, cortina] = useAparicion({ amount: 0.25 })
 
-  // Profundidad: el dibujo se desplaza dentro de su marco al pasar por
-  // pantalla. El marco recorta y el dibujo esta al 110%, asi que el
+  // Profundidad: la foto se desplaza dentro de su marco al pasar por
+  // pantalla. El marco recorta y la capa mide 116% de alto, asi que el
   // recorrido nunca descubre un borde vacio. Delta corto (6%), que es lo
   // que separa la sensacion de profundidad del mareo.
+  //
+  // El parallax va en la capa y el zoom de rueda en el <img> que lleva
+  // dentro: dos elementos distintos, dos transformaciones que no se pisan.
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start end', 'end start'],
   })
-  const yDibujo = useTransform(scrollYProgress, [0, 1], ['-6%', '6%'])
+  const yFoto = useTransform(scrollYProgress, [0, 1], ['-6%', '6%'])
 
   const rotX = useMotionValue(0)
   const rotY = useMotionValue(0)
@@ -68,11 +71,21 @@ function Tarjeta({ proyecto, indice }) {
           transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
         >
           <motion.div
-            className="capa-dibujo"
-            style={sinMovimiento ? undefined : { y: yDibujo }}
+            className="capa-foto"
+            style={sinMovimiento ? undefined : { y: yFoto }}
           >
-            <Dibujo nombre={proyecto.dibujo} alt={proyecto.alt} />
+            <ImagenZoom
+              src={proyecto.foto.src}
+              alt={proyecto.alt}
+              ancho={proyecto.foto.w}
+              alto={proyecto.foto.h}
+            />
           </motion.div>
+
+          {/* El gesto de la rueda no se adivina. La pista aparece al pasar
+              por encima, dentro del marco recortado, y nunca sustituye a
+              nada: la foto ya se ve entera sin tocarla. */}
+          {!sinMovimiento && <span className="pista-zoom" aria-hidden="true">Rueda para acercar</span>}
         </motion.div>
 
         <div className="pie-card">

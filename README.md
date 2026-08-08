@@ -12,7 +12,7 @@ contacto son inventados y están todos en `src/data/proyectos.js`.
 npm install
 npm run dev        # servidor de desarrollo en :5173
 npm run build      # compila a dist/
-npm test           # 50 comprobaciones funcionales en un navegador real
+npm test           # 68 comprobaciones funcionales en un navegador real
 npm run typecheck
 ```
 
@@ -21,13 +21,26 @@ npm run typecheck
 ```
 src/
 ├── App.jsx              orquesta la intro y el orden de las secciones
+├── assets/fotos/        las fotografías de obra y el retrato
 ├── components/          una por sección, más las piezas de movimiento
-├── data/proyectos.js    proyectos, etapas y cifras
+├── data/proyectos.js    proyectos, etapas, cifras y rutas de las fotos
 ├── hooks/               aparición al scroll, sección activa, movimiento
 └── styles/              base.css (tokens) + fonts.css (Poppins en base64)
 tests/funcional.mjs      conduce Edge/Chrome con puppeteer-core
 legacy/                  la versión anterior en HTML plano, autocontenida
 ```
+
+## Las fotografías
+
+Van importadas desde `src/data/proyectos.js`, así que Vite las versiona y
+las emite como archivos sueltos: todas se cargan en diferido y llevan sus
+medidas en el `<img>` para que la tarjeta no dé el salto al llegar la
+imagen. El `alt` describe lo que se ve, no lo que dice el título.
+
+Sobre cada foto hay un zoom con la rueda del ratón (1x–1.8x,
+`ImagenZoom.jsx`). Solo actúa si el puntero está encima **y** la página
+lleva un momento quieta, y en los topes devuelve la rueda al scroll: la
+foto nunca atrapa el gesto. Con movimiento reducido no se monta.
 
 ## Movimiento y accesibilidad
 

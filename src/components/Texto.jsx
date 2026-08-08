@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { useSinMovimiento } from '../hooks/useMovimiento.js'
 
@@ -9,6 +9,13 @@ import { useSinMovimiento } from '../hooks/useMovimiento.js'
  * cada palabra va con aria-hidden. El lector de pantalla lee la frase de
  * corrido y nunca se topa con las letras sueltas. Las palabras no se
  * rompen entre lineas porque cada una es un inline-block propio.
+ *
+ * El espacio entre palabras va FUERA del <span class="pal">, entre dos de
+ * ellos. Dentro no se ve: `.pal` es inline-block con white-space: nowrap, y
+ * CSS descarta el espacio final de una linea —el titular salia pegado,
+ * "Proyectosseleccionados"—. Fuera es un nodo de texto entre dos cajas en
+ * linea, que es exactamente donde el navegador espera encontrarlo: se
+ * dibuja, y ademas el titular puede partir ahi cuando no cabe.
  */
 
 const entradaLetra = {
@@ -42,19 +49,21 @@ export function TituloPartido({ texto, className, id, retardo = 0 }) {
       viewport={{ once: true, amount: 0.2 }}
     >
       {palabras.map((palabra, i) => (
-        <span className="pal" aria-hidden="true" key={i}>
-          {palabra.split('').map((car, j) => (
-            <motion.span
-              className="ltr"
-              key={j}
-              variants={entradaLetra}
-              transition={{ ...transicionLetra, delay: retardo + n++ * 0.016 }}
-            >
-              {car}
-            </motion.span>
-          ))}
+        <Fragment key={i}>
+          <span className="pal" aria-hidden="true">
+            {palabra.split('').map((car, j) => (
+              <motion.span
+                className="ltr"
+                key={j}
+                variants={entradaLetra}
+                transition={{ ...transicionLetra, delay: retardo + n++ * 0.016 }}
+              >
+                {car}
+              </motion.span>
+            ))}
+          </span>
           {i < palabras.length - 1 && ' '}
-        </span>
+        </Fragment>
       ))}
     </motion.h2>
   )
@@ -157,12 +166,14 @@ export function TituloHero({ texto, className, arrancar }) {
       animate={arrancar ? 'visible' : 'oculto'}
     >
       {palabras.map((palabra, i) => (
-        <span className="pal" aria-hidden="true" key={i}>
-          {palabra.split('').map((car, j) => (
-            <LetraIman car={car} indice={n++} raton={raton} colocada={colocada} key={j} />
-          ))}
+        <Fragment key={i}>
+          <span className="pal" aria-hidden="true">
+            {palabra.split('').map((car, j) => (
+              <LetraIman car={car} indice={n++} raton={raton} colocada={colocada} key={j} />
+            ))}
+          </span>
           {i < palabras.length - 1 && ' '}
-        </span>
+        </Fragment>
       ))}
     </motion.h1>
   )

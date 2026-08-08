@@ -1,3 +1,11 @@
+import fotoCasaLadera from '../assets/fotos/casa-ladera.jpg'
+import fotoPabellonLumen from '../assets/fotos/pabellon-lumen.jpg'
+import fotoRefugioAndino from '../assets/fotos/refugio-andino.jpg'
+import fotoMercadoCentral from '../assets/fotos/mercado-central.jpg'
+import fotoSilo from '../assets/fotos/silo.jpg'
+import fotoBibliotecaRio from '../assets/fotos/biblioteca-rio.jpg'
+import fotoMarina from '../assets/fotos/marina-olivares.jpg'
+
 /**
  * Los seis proyectos de la portada.
  *
@@ -5,9 +13,13 @@
  * editorial: anchos desiguales sobre 12 columnas y arranques a distinta
  * altura. Cambiar el orden del array cambia la composicion.
  *
- * `dibujo` nombra el trazo de Dibujos.jsx. Cuando existan fotos reales,
- * este campo se sustituye por la ruta de la imagen y la tarjeta pasa a
- * renderizar un <img srcset> en vez del SVG.
+ * `foto` lleva medidas ademas de la ruta. No son decorativas: van al
+ * width/height del <img> para que el navegador reserve el hueco exacto
+ * antes de descargar nada, y la tarjeta no de el salto que arruina el CLS.
+ * La proporcion del marco (`proporcion`) y la de la foto no coinciden
+ * siempre: el recorte lo resuelve object-fit: cover.
+ *
+ * `alt` describe lo que se ve en la imagen, no lo que dice el titulo.
  */
 export const proyectos = [
   {
@@ -15,8 +27,8 @@ export const proyectos = [
     titulo: 'Casa Ladera',
     categoria: 'residencial',
     meta: 'Residencial · Farellones · 2024',
-    alt: 'Casa Ladera: fachada poniente en hormigón y madera',
-    dibujo: 'casa',
+    alt: 'Casa Ladera: volúmenes bajos de piedra y madera con grandes ventanales, iluminados al atardecer sobre una ladera boscosa',
+    foto: { src: fotoCasaLadera, w: 1024, h: 640 },
     proporcion: 'r43',
     ancho: 'w7',
     desfase: null,
@@ -26,8 +38,8 @@ export const proyectos = [
     titulo: 'Pabellón Lumen',
     categoria: 'cultural',
     meta: 'Cultural · Valparaíso · 2023',
-    alt: 'Pabellón Lumen: sección transversal con luz cenital',
-    dibujo: 'pabellon',
+    alt: 'Pabellón Lumen: planta baja dibujada, con las salas escalonadas entre la arboleda y las curvas de nivel del terreno',
+    foto: { src: fotoPabellonLumen, w: 1199, h: 1685 },
     proporcion: 'r34',
     ancho: 'w5',
     desfase: 'd24',
@@ -37,8 +49,8 @@ export const proyectos = [
     titulo: 'Refugio Andino',
     categoria: 'residencial',
     meta: 'Residencial · Cajón del Maipo · 2023',
-    alt: 'Refugio Andino: volumen compacto de piedra sobre la ladera',
-    dibujo: 'refugio',
+    alt: 'Refugio Andino: volumen vertical de hormigón y celosía de madera, con terrazas plantadas en cada nivel',
+    foto: { src: fotoRefugioAndino, w: 828, h: 1471 },
     proporcion: 'r34',
     ancho: 'w5',
     desfase: null,
@@ -48,8 +60,8 @@ export const proyectos = [
     titulo: 'Mercado Central',
     categoria: 'comercial',
     meta: 'Comercial · Rancagua · 2022',
-    alt: 'Mercado Central: planta de cubierta y estructura reticulada',
-    dibujo: 'mercado',
+    alt: 'Mercado Central: planta de conjunto con el anfiteatro circular, la franja arbolada y el área de comercio',
+    foto: { src: fotoMercadoCentral, w: 736, h: 1308 },
     proporcion: 'r43',
     ancho: 'w7',
     desfase: 'd20',
@@ -59,8 +71,8 @@ export const proyectos = [
     titulo: 'Silo',
     categoria: 'interiorismo',
     meta: 'Interiorismo · Talca · 2021',
-    alt: 'Silo: interior rehabilitado con escalera helicoidal',
-    dibujo: 'silo',
+    alt: 'Silo: patio interior rehabilitado con arcos encalados, escalera de piedra y suelo de mosaico',
+    foto: { src: fotoSilo, w: 960, h: 1264 },
     proporcion: 'r11',
     ancho: 'w6',
     desfase: null,
@@ -70,13 +82,21 @@ export const proyectos = [
     titulo: 'Biblioteca del Río',
     categoria: 'cultural',
     meta: 'Cultural · Valdivia · 2025',
-    alt: 'Biblioteca del Río: alzado con celosía de hormigón',
-    dibujo: 'biblioteca',
+    alt: 'Biblioteca del Río: planta circular con las salas dispuestas en anillo alrededor de un patio central',
+    foto: { src: fotoBibliotecaRio, w: 1125, h: 1115 },
     proporcion: 'r11',
     ancho: 'w6',
     desfase: 'd16',
   },
 ]
+
+/** El retrato de quien dirige el estudio. Vive en la sección Estudio. */
+export const retrato = {
+  src: fotoMarina,
+  w: 735,
+  h: 985,
+  alt: 'Marina Olivares, arquitecta, sentada en un sillón sobre fondo oscuro',
+}
 
 export const categorias = [
   { id: 'todos', etiqueta: 'Todos' },

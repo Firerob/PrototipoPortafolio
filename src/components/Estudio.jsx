@@ -1,7 +1,12 @@
 import Revelar from './Revelar.jsx'
 import { TituloPartido } from './Texto.jsx'
+import ImagenZoom from './ImagenZoom.jsx'
+import { retrato } from '../data/proyectos.js'
+import { useSinMovimiento } from '../hooks/useMovimiento.js'
 
 export default function Estudio() {
+  const sinMovimiento = useSinMovimiento()
+
   return (
     <section id="estudio" className="seccion estudio">
       <div className="wrap">
@@ -9,6 +14,27 @@ export default function Estudio() {
           <div className="c-izq">
             <Revelar as="p" className="eyebrow">Estudio</Revelar>
             <TituloPartido texto="Construir con pocos gestos" className="h2" />
+
+            {/* El retrato va aqui y no en el hero: el hero lo abre el plano
+                dibujandose solo, y una cara compitiendo con el le quitaria
+                el sitio. Aqui, junto a la ficha de dirección, la foto
+                responde a la pregunta que el texto acaba de abrir. */}
+            <Revelar as="figure" className="retrato" retardo={0.08}>
+              <div className="marco r34">
+                <ImagenZoom
+                  src={retrato.src}
+                  alt={retrato.alt}
+                  ancho={retrato.w}
+                  alto={retrato.h}
+                />
+                {!sinMovimiento && (
+                  <span className="pista-zoom" aria-hidden="true">Rueda para acercar</span>
+                )}
+              </div>
+              <figcaption className="small">
+                Marina Olivares, en el estudio de Santiago.
+              </figcaption>
+            </Revelar>
           </div>
 
           <div className="c-der">

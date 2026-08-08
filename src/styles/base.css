@@ -268,11 +268,39 @@ html { scroll-behavior: smooth; }
 }
 .card.oculta { display: none; }
 
-.marco { overflow: hidden; background: var(--fog); }
+/* El marco es quien recorta: la foto puede crecer hasta 1.8x sin asomar
+   por ningun borde de la tarjeta. `position: relative` ancla la pista. */
+.marco { position: relative; overflow: hidden; background: var(--fog); }
 .marco.r43 { aspect-ratio: 4 / 3; }
 .marco.r34 { aspect-ratio: 3 / 4; }
 .marco.r11 { aspect-ratio: 1 / 1; }
-.shot { width: 100%; height: 100%; transform: scale(1.1); will-change: transform; }
+
+/* La proporcion del marco y la de la foto no coinciden: cover recorta y
+   nunca deforma. El width/height del <img> reserva el hueco antes de la
+   descarga; sin ellos la tarjeta daria el salto al llegar la imagen. */
+.shot { width: 100%; height: 100%; object-fit: cover; will-change: transform; }
+
+/* Caja de escucha de la rueda. No transforma nada: la escala va en el
+   <img> que lleva dentro, para no arrastrar con ella a la pista. */
+.zoom { width: 100%; height: 100%; }
+
+/* La pista del gesto: solo aparece al pasar por encima y solo donde el
+   gesto existe (raton). Es aria-hidden, adorno puro. */
+/* Arriba y no abajo: las tarjetas verticales miden mas que la ventana, y
+   una pista anclada al pie cae fuera de pantalla justo cuando el cursor
+   esta sobre la foto. El borde superior si se ve al bajar hacia ella. */
+.pista-zoom {
+  position: absolute; left: 1rem; top: 1rem; z-index: 1;
+  padding: .45rem .75rem;
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--paper); background: rgba(17,17,17,.86);
+  backdrop-filter: blur(4px);
+  opacity: 0; transform: translateY(-6px); pointer-events: none;
+  transition: opacity var(--t-mid) var(--ease), transform var(--t-mid) var(--ease);
+}
+.marco:hover .pista-zoom { opacity: 1; transform: none; }
+@media (hover: none), (pointer: coarse) { .pista-zoom { display: none; } }
+@media (prefers-reduced-motion: reduce) { .pista-zoom { display: none; } }
 
 .pie-card { padding-top: 1.5rem; display: flex; align-items: baseline; justify-content: space-between; gap: 1.5rem; }
 .pie-card h3 { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 300; color: var(--ink); }
@@ -308,6 +336,12 @@ html { scroll-behavior: smooth; }
 }
 .ficha { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; padding-top: 1rem; font-size: .875rem; }
 .ficha p + p { margin-top: .5rem; color: var(--ink); }
+
+/* Retrato de dirección. Ancho contenido: en la columna de 5 el marco 3:4
+   ya es alto, y a pantalla completa una cara del tamaño de un proyecto
+   desequilibraría la jerarquía —la obra manda, la autora acompaña. */
+.retrato { margin-top: 2.5rem; max-width: 20rem; }
+.retrato figcaption { margin-top: .75rem; color: var(--body); }
 
 /* ── Proceso: es una secuencia real, por eso va numerado ─── */
 .etapas { row-gap: 3rem; }
@@ -391,9 +425,13 @@ form .btn { margin-top: 2rem; }
 }
 
 /* Capa que se desplaza dentro del marco recortado.
-   El dibujo va al 110% (regla .shot) para que el recorrido del parallax
-   no llegue nunca a descubrir un borde vacio. */
-.capa-dibujo { width: 100%; height: 100%; will-change: transform; }
+   El parallax la mueve ±6% de su propia altura, asi que la altura tiene
+   que dar de si o el recorrido descubriria un borde vacio. Con 116% y el
+   -8% que la recentra: en el extremo alto el borde superior queda en
+   -1.04% y el inferior en 101.04%. Justo, pero siempre por fuera.
+   El sobredimensionado vive aqui y no en el <img>, para que la escala del
+   zoom de rueda arranque limpia en 1x. */
+.capa-foto { width: 100%; height: 116%; margin-top: -8%; will-change: transform; }
 
 /* Mascara del numero: recorta mientras sube */
 .mascara-cifra { display: block; overflow: hidden; }

@@ -34,6 +34,8 @@ const TIPOS = {
   '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.svg': 'image/svg+xml',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
   '.woff2': 'font/woff2',
 }
 
@@ -155,6 +157,23 @@ async function main() {
         !!n.getAttribute('aria-label') && n.querySelectorAll('.pal[aria-hidden="true"]').length > 0),
       await page.$eval('.hero h1', (n) => `aria-label="${n.getAttribute('aria-label')}"`))
 
+    // El espacio entre palabras se mide en pantalla, no en el DOM: estaba
+    // en el textContent y aun asi el titular salia pegado, porque el
+    // espacio vivia dentro de un inline-block con nowrap y CSS lo descarta.
+    const huecos = await page.$eval('.hero h1', (n) => {
+      const cajas = [...n.querySelectorAll('.pal')].map((p) => p.getBoundingClientRect())
+      const separaciones = []
+      for (let i = 1; i < cajas.length; i++) {
+        // solo las palabras que comparten linea: entre lineas no hay hueco
+        if (Math.abs(cajas[i].top - cajas[i - 1].top) < 2) {
+          separaciones.push(Math.round(cajas[i].left - cajas[i - 1].right))
+        }
+      }
+      return separaciones
+    })
+    anota('Las palabras del titular se separan en pantalla',
+      huecos.length > 0 && huecos.every((h) => h > 3), `huecos de ${huecos.join(', ')} px`)
+
     const visibles = await page.$$eval('.hero h1 .ltr',
       (ns) => ns.filter((n) => parseFloat(getComputedStyle(n).opacity) > 0.9).length)
     anota('La animación de entrada terminó (letras visibles)', visibles === letras,
@@ -208,6 +227,144 @@ async function main() {
     await pausa(700)
     anota('Las tarjetas se inclinan hacia el cursor', antesMarco !== (await leerMarco()),
       'matrix3d aplicada')
+
+    // ── Las fotografías ────────────────────────────────────────
+    // Todas son lazy, asi que primero hay que pasar por delante de ellas.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.body.scrollHeight; y += 500) {
+        window.scrollTo(0, y)
+        await new Promise((r) => setTimeout(r, 90))
+      }
+    })
+    await pausa(2000)
+    const fotos = await page.$$eval('.shot', (ns) => ns.map((n) => ({
+      cargada: n.complete && n.naturalWidth > 0,
+      nombre: n.currentSrc.split('/').pop().split('-')[0],
+      alt: n.alt, medidas: !!(n.getAttribute('width') && n.getAttribute('height')),
+      lazy: n.loading === 'lazy', recorte: getComputedStyle(n).objectFit === 'cover',
+    })))
+    anota('Las 7 fotos reales cargan (6 proyectos + retrato)',
+      fotos.length === 7 && fotos.every((f) => f.cargada), fotos.map((f) => f.nombre).join(' '))
+    anota('Cada foto lleva alt descriptivo, medidas y carga diferida',
+      fotos.every((f) => f.alt.length > 25 && f.medidas && f.lazy && f.recorte),
+      `${fotos.filter((f) => f.alt.length > 25 && f.medidas && f.lazy).length}/7 completas`)
+
+    // ── Zoom con la rueda sobre la foto ────────────────────────
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await pausa(600)
+    await page.evaluate(() => document.querySelector('#proyectos').scrollIntoView())
+    await pausa(1600)
+    const leerEscala = () => page.$eval('.card .shot',
+      (n) => new DOMMatrix(getComputedStyle(n).transform).a)
+    const enFoto = async () => {
+      const b = await (await page.$('.card .marco')).boundingBox()
+      await page.mouse.move(5, 400)      // salir para forzar el mouseenter
+      await pausa(250)
+      await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2)
+      await pausa(450)                   // supera la espera de quietud
+    }
+    const scrollY = () => page.evaluate(() => window.scrollY)
+
+    anota('En reposo la foto está a 1x', Math.abs((await leerEscala()) - 1) < 0.01,
+      `escala=${(await leerEscala()).toFixed(3)}`)
+
+    // A 1x, rueda abajo: la foto no puede alejarse mas, asi que devuelve el
+    // gesto a la pagina. Sin esto, la foto seria una trampa para el scroll.
+    await enFoto()
+    const yTope = await scrollY()
+    await page.mouse.wheel({ deltaY: 120 })
+    await pausa(500)
+    anota('En 1x la rueda no atrapa el gesto: la página sigue bajando',
+      (await scrollY()) > yTope, `scrollY ${yTope} → ${await scrollY()}`)
+
+    await enFoto()
+    const yQuieto = await scrollY()
+    for (let i = 0; i < 3; i++) { await page.mouse.wheel({ deltaY: -100 }); await pausa(120) }
+    await pausa(800)
+    const acercada = await leerEscala()
+    anota('Rueda arriba acerca la foto', acercada > 1.4, `1.00x → ${acercada.toFixed(2)}x`)
+    anota('Mientras hay zoom la página no se mueve', (await scrollY()) === yQuieto,
+      `scrollY ${yQuieto} → ${await scrollY()}`)
+
+    // El techo se mide DURANTE el gesto: al saturar, las muescas sobrantes
+    // vuelven a ser scroll y la tarjeta se va de debajo del cursor.
+    let techo = acercada
+    let ySat = await scrollY()
+    for (let i = 0; i < 6; i++) {
+      await page.mouse.wheel({ deltaY: -100 })
+      await pausa(250)
+      techo = Math.max(techo, await leerEscala())
+      if ((await scrollY()) !== ySat) break
+    }
+    anota('El zoom se detiene en 1.8x', techo > 1.75 && techo <= 1.81, `máximo=${techo.toFixed(3)}x`)
+    anota('Saturado el zoom, la rueda vuelve a ser de la página',
+      (await scrollY()) < ySat, `scrollY ${ySat} → ${await scrollY()}`)
+
+    const dentroDelMarco = await page.$eval('.card .marco', (n) => {
+      const img = n.querySelector('.shot')
+      img.style.transform = 'scale(1.8)'
+      const m = n.getBoundingClientRect(), i = img.getBoundingClientRect()
+      const r = {
+        desborda: i.width > m.width + 2 && i.height > m.height + 2,
+        oculto: getComputedStyle(n).overflow === 'hidden',
+        sobra: Math.round(i.width - m.width),
+      }
+      img.style.transform = ''
+      return r
+    })
+    anota('A 1.8x la foto no se sale de la tarjeta: el marco la recorta',
+      dentroDelMarco.desborda && dentroDelMarco.oculto,
+      `${dentroDelMarco.sobra}px fuera, overflow:hidden`)
+
+    await page.evaluate(() => document.querySelector('#proyectos').scrollIntoView())
+    await pausa(1400)
+    await enFoto()
+    for (let i = 0; i < 3; i++) { await page.mouse.wheel({ deltaY: -100 }); await pausa(120) }
+    await pausa(700)
+    const antesAlejar = await leerEscala()
+    for (let i = 0; i < 3; i++) { await page.mouse.wheel({ deltaY: 100 }); await pausa(120) }
+    await pausa(700)
+    const alejada = await leerEscala()
+    anota('Rueda abajo aleja la foto', alejada < antesAlejar - 0.3,
+      `${antesAlejar.toFixed(2)}x → ${alejada.toFixed(2)}x`)
+
+    await page.mouse.move(5, 400)
+    await pausa(900)
+    anota('Al salir el cursor la foto vuelve sola a 1x',
+      Math.abs((await leerEscala()) - 1) < 0.02, `escala=${(await leerEscala()).toFixed(3)}`)
+
+    // Un scroll seguido que pasa por encima de una foto no se secuestra:
+    // la imagen solo se queda la rueda si la pagina esta parada.
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await pausa(700)
+    await page.evaluate(() => document.querySelector('#proyectos').scrollIntoView())
+    await pausa(1400)
+    const cajaSeguido = await (await page.$('.card .marco')).boundingBox()
+    await page.mouse.move(cajaSeguido.x + cajaSeguido.width / 2, cajaSeguido.y + cajaSeguido.height / 2)
+    const ySeguido = await scrollY()
+    for (let i = 0; i < 8; i++) { await page.mouse.wheel({ deltaY: -70 }); await pausa(25) }
+    await pausa(600)
+    anota('Un scroll seguido sobre la foto no se secuestra',
+      (await scrollY()) < ySeguido - 100 && (await leerEscala()) < 1.05,
+      `scrollY ${ySeguido} → ${await scrollY()}, escala=${(await leerEscala()).toFixed(2)}x`)
+
+    // El retrato del estudio usa la misma pieza
+    await page.evaluate(() => document.querySelector('#estudio').scrollIntoView())
+    await pausa(1600)
+    const cajaRetrato = await (await page.$('.retrato .marco')).boundingBox()
+    await page.mouse.move(cajaRetrato.x + cajaRetrato.width / 2, cajaRetrato.y + cajaRetrato.height / 2)
+    await pausa(450)
+    for (let i = 0; i < 3; i++) { await page.mouse.wheel({ deltaY: -100 }); await pausa(120) }
+    await pausa(700)
+    const retratoEscala = await page.$eval('.retrato .shot',
+      (n) => new DOMMatrix(getComputedStyle(n).transform).a)
+    anota('El retrato del estudio también hace zoom', retratoEscala > 1.4,
+      `escala=${retratoEscala.toFixed(2)}x`)
+
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await pausa(600)
+    await page.evaluate(() => document.querySelector('#proyectos').scrollIntoView())
+    await pausa(1400)
 
     // ── Filtro ─────────────────────────────────────────────────
     await page.$$eval('.filtro', (ns) => ns.find((n) => n.textContent === 'Residencial').click())
@@ -312,14 +469,14 @@ async function main() {
     // Parallax interior del dibujo
     await page.evaluate(() => window.scrollTo(0, 0))
     await pausa(600)
-    const leerCapa = () => page.$eval('.capa-dibujo', (n) => getComputedStyle(n).transform)
+    const leerCapa = () => page.$eval('.capa-foto', (n) => getComputedStyle(n).transform)
     await page.evaluate(() => document.querySelector('#proyectos').scrollIntoView())
     await pausa(900)
     const capa1 = await leerCapa()
     await page.evaluate(() => window.scrollBy(0, 500))
     await pausa(900)
     const capa2 = await leerCapa()
-    anota('El dibujo se desplaza dentro de su marco al hacer scroll',
+    anota('La foto se desplaza dentro de su marco al hacer scroll',
       capa1 !== capa2, `${capa1.slice(0, 26)} → ${capa2.slice(0, 26)}`)
 
     // El hero se despide
@@ -367,10 +524,15 @@ async function main() {
       errores.length ? errores.join(' | ') : 'consola limpia')
 
     // ── Y ahora con movimiento reducido ────────────────────────
+    // El sitio anima por defecto (MOVIMIENTO_POR_DEFECTO en useMovimiento.js),
+    // asi que para comprobar la ruta de movimiento reducido hay que pedir el
+    // mando del sistema con ?movimiento=0. El dia que esa constante vuelva a
+    // false, este parametro sobra pero no estorba: el resultado es el mismo.
     const page2 = await browser.newPage()
     await page2.setViewport({ width: 1280, height: 860 })
     await page2.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
-    await page2.goto(`http://127.0.0.1:${PUERTO}/index.html`, { waitUntil: 'networkidle0' })
+    await page2.goto(`http://127.0.0.1:${PUERTO}/index.html?movimiento=0`,
+      { waitUntil: 'networkidle0' })
     await pausa(900)
 
     anota('Con movimiento reducido no hay intro',
@@ -384,6 +546,29 @@ async function main() {
       await page2.$eval('.hero h1', (n) => `"${n.textContent.trim()}"`))
     anota('Con movimiento reducido las fotos se ven sin cortina',
       await page2.$eval('.card .marco', (n) => !getComputedStyle(n).clipPath.includes('100%')))
+
+    // El zoom de rueda es adorno: sin movimiento no se monta y la rueda
+    // nunca deja de ser de la pagina.
+    await page2.evaluate(() => document.querySelector('#proyectos').scrollIntoView())
+    await pausa(1200)
+    const cajaSin = await (await page2.$('.card .marco')).boundingBox()
+    await page2.mouse.move(cajaSin.x + cajaSin.width / 2, cajaSin.y + cajaSin.height / 2)
+    await pausa(500)
+    const ySin = await page2.evaluate(() => window.scrollY)
+    await page2.mouse.wheel({ deltaY: -200 })
+    await pausa(600)
+    anota('Con movimiento reducido la rueda sigue siendo de la página',
+      (await page2.evaluate(() => window.scrollY)) < ySin,
+      `scrollY ${ySin} → ${await page2.evaluate(() => window.scrollY)}`)
+    anota('Con movimiento reducido la foto no se escala',
+      ['none', 'matrix(1, 0, 0, 1, 0, 0)']
+        .includes(await page2.$eval('.card .shot', (n) => getComputedStyle(n).transform)))
+    anota('Con movimiento reducido no se anuncia un gesto que no existe',
+      (await page2.$('.pista-zoom')) === null)
+    anota('Con movimiento reducido las fotos se siguen viendo',
+      await page2.$eval('.card .shot', (n) => n.complete && n.naturalWidth > 0))
+    await page2.evaluate(() => window.scrollTo(0, 0))
+    await pausa(600)
     anota('Con movimiento reducido el contenido es visible',
       await page2.$eval('.hero h1', (n) => parseFloat(getComputedStyle(n).opacity) > 0.9))
     // La barra de progreso informa, no decora: sobrevive al movimiento reducido
@@ -392,10 +577,28 @@ async function main() {
     anota('Con movimiento reducido el hero no se desvanece',
       await page2.$eval('.hero .wrap', (n) => parseFloat(getComputedStyle(n).opacity) > 0.95))
 
-    // ── Anulacion manual del movimiento ────────────────────────
-    // Windows permite desactivar las animaciones del sistema, y entonces el
-    // sitio se apaga entero, que es lo correcto. `?movimiento=1` existe para
-    // poder revisar el trabajo sin tener que cambiar el sistema.
+    // ── El movimiento va por defecto ───────────────────────────
+    // Contexto limpio: sin nada guardado en localStorage, que es como llega
+    // alguien la primera vez. Con el sistema pidiendo movimiento reducido,
+    // el sitio anima igualmente porque MOVIMIENTO_POR_DEFECTO esta en true.
+    // Si esa constante vuelve a false —lo recomendable antes de publicar—,
+    // esta comprobacion es la primera que debe cambiar.
+    const limpia = await browser.createBrowserContext()
+    const primeraVez = await limpia.newPage()
+    await primeraVez.setViewport({ width: 1280, height: 860 })
+    await primeraVez.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
+    await primeraVez.goto(`http://127.0.0.1:${PUERTO}/index.html`, { waitUntil: 'networkidle0' })
+    await pausa(700)
+    anota('Sin preferencia guardada, el sitio anima aunque el sistema pida lo contrario',
+      (await primeraVez.$('[class*="z-[100]"]')) !== null, 'la intro aparece')
+    await pausa(4200)
+    anota('Y el titular se parte en letras a la primera visita',
+      (await primeraVez.$$eval('.hero h1 .ltr', (ns) => ns.length)) >= 15)
+    await limpia.close()
+
+    // ── Devolver el mando al sistema, y recuperarlo ────────────
+    // `?movimiento=0` es ahora la salida para quien de verdad no quiere
+    // movimiento; `?movimiento=1` lo devuelve. Las dos se recuerdan.
     const forzada = await browser.newPage()
     await forzada.setViewport({ width: 1280, height: 860 })
     await forzada.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
