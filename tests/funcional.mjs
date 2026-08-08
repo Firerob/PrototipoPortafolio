@@ -36,6 +36,7 @@ const TIPOS = {
   '.svg': 'image/svg+xml',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
+  '.mp4': 'video/mp4',
   '.woff2': 'font/woff2',
 }
 
@@ -77,7 +78,10 @@ async function main() {
   const browser = await puppeteer.launch({
     executablePath: navegador,
     headless: true,
-    args: ['--no-sandbox', '--disable-gpu'],
+    // El retrato del hero se reproduce solo, sin que nadie lo pulse. Sin
+    // esta politica el navegador lo bloquea y la prueba mediria el bloqueo
+    // en vez del comportamiento.
+    args: ['--no-sandbox', '--disable-gpu', '--autoplay-policy=no-user-gesture-required'],
   })
 
   try {
@@ -127,6 +131,13 @@ async function main() {
         return !!centro?.closest('[class*="z-[100]"]')
       }))
 
+    // El retrato del hero pesa 4 MB, mas que todo lo demas junto. Mientras
+    // la intro tapa la pantalla no puede estar descargandose: compite por
+    // el ancho de banda con lo unico que el visitante va a ver primero.
+    anota('El vídeo del hero NO se descarga durante la intro',
+      !peticiones.some((u) => u.endsWith('.mp4')),
+      `${peticiones.filter((u) => u.endsWith('.mp4')).length} peticiones de vídeo`)
+
     const leerIntro = () => page.evaluate(() => {
       const c = document.querySelector('[class*="z-[100]"]')
       return c ? c.innerText.replace(/\s+/g, ' ').trim() : null
@@ -156,6 +167,34 @@ async function main() {
       await page.$eval('.hero h1', (n) =>
         !!n.getAttribute('aria-label') && n.querySelectorAll('.pal[aria-hidden="true"]').length > 0),
       await page.$eval('.hero h1', (n) => `aria-label="${n.getAttribute('aria-label')}"`))
+
+    // ── Retrato animado del hero ───────────────────────────────
+    await pausa(2500)   // margen para que arranque y empiece a correr
+    const retrato = await page.evaluate(() => {
+      const v = document.querySelector('.retrato-hero video')
+      if (!v) return null
+      return { src: !!v.src, pausado: v.paused, t: v.currentTime, w: v.videoWidth, h: v.videoHeight,
+               enBucle: v.loop, silencioso: v.muted }
+    })
+    anota('Terminada la intro, el vídeo del hero sí se descarga',
+      peticiones.some((u) => u.endsWith('.mp4')), 'se pidió el .mp4')
+    anota('El retrato del hero se reproduce solo, en bucle y sin sonido',
+      retrato && !retrato.pausado && retrato.t > 0 && retrato.enBucle && retrato.silencioso,
+      retrato ? `t=${retrato.t.toFixed(2)}s, ${retrato.w}x${retrato.h}` : 'no hay vídeo')
+    anota('El vídeo conserva la proporción 3:4 de la fotografía',
+      retrato && Math.abs(retrato.w / retrato.h - 0.75) < 0.01,
+      retrato ? (retrato.w / retrato.h).toFixed(3) : '—')
+
+    // Un hero sin su llamada a la accion no es un hero. Al colocar el
+    // retrato a mano en la rejilla, los botones se fueron 300 px por
+    // debajo del pliegue sin que nada fallara: la rejilla los recoloco.
+    const cta = await page.evaluate(() => {
+      const e = document.querySelector('.hero .c-cta')
+      const b = e.getBoundingClientRect()
+      return { dentro: b.bottom <= innerHeight + 1 && b.top >= 0, top: Math.round(b.top) }
+    })
+    anota('Los botones del hero siguen sobre el pliegue', cta.dentro,
+      `top=${cta.top}px de ${860}`)
 
     // El espacio entre palabras se mide en pantalla, no en el DOM: estaba
     // en el textContent y aun asi el titular salia pegado, porque el
@@ -237,7 +276,9 @@ async function main() {
       }
     })
     await pausa(2000)
-    const fotos = await page.$$eval('.shot', (ns) => ns.map((n) => ({
+    // `img.shot`, no `.shot`: el retrato del hero es un <video> con esa
+    // misma clase y no tiene alt, naturalWidth ni loading que comprobar.
+    const fotos = await page.$$eval('img.shot', (ns) => ns.map((n) => ({
       cargada: n.complete && n.naturalWidth > 0,
       nombre: n.currentSrc.split('/').pop().split('-')[0],
       alt: n.alt, medidas: !!(n.getAttribute('width') && n.getAttribute('height')),
@@ -565,6 +606,15 @@ async function main() {
         .includes(await page2.$eval('.card .shot', (n) => getComputedStyle(n).transform)))
     anota('Con movimiento reducido no se anuncia un gesto que no existe',
       (await page2.$('.pista-zoom')) === null)
+
+    // El retrato del hero no se degrada a un video parado: se cambia por
+    // la fotografia, que es su propio primer fotograma y dice lo mismo.
+    anota('Con movimiento reducido el retrato del hero es una foto, no un vídeo',
+      (await page2.$('.retrato-hero video')) === null &&
+      (await page2.$('.retrato-hero img')) !== null)
+    anota('Con movimiento reducido no se descarga el vídeo',
+      !(await page2.evaluate(() =>
+        performance.getEntriesByType('resource').some((r) => r.name.endsWith('.mp4')))))
     anota('Con movimiento reducido las fotos se siguen viendo',
       await page2.$eval('.card .shot', (n) => n.complete && n.naturalWidth > 0))
     await page2.evaluate(() => window.scrollTo(0, 0))

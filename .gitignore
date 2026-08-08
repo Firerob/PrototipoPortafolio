@@ -8,6 +8,11 @@ dist/
 # dentro (la skill ui-ux-pro-max), que git trataria como submodulo roto.
 .claude/
 
+# Skills de agente instaladas con `npx skills add`. Son 1,3 MB de codigo de
+# terceros que se reinstala con ese mismo comando: no es fuente de este
+# proyecto y no pinta nada en el historial de un portafolio.
+.agents/
+
 # Material de referencia ajeno.
 # El HTML de Pelizzari Studio es una copia guardada de su sitio: 13 MB de
 # contenido y fotografias de otro estudio. Sirve de referencia local, pero

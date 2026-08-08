@@ -19,11 +19,16 @@ export default defineConfig({
     // Sin este limite alto Vite las extraeria a archivos sueltos y la
     // pagina dejaria de ser autocontenida.
     //
-    // Las fotografias son la excepcion: incrustarlas en base64 las mete
-    // dentro del JS, las engorda un 33% y —lo que importa— anula el
-    // `loading="lazy"`, porque un data: URI ya viene descargado. Salen
-    // como archivos sueltos para que el navegador pida cada una cuando
-    // toque y pueda cachearlas por separado.
-    assetsInlineLimit: (ruta) => !/\.(jpe?g|png|webp|avif|gif)$/i.test(ruta),
+    // Las fotografias y el video son la excepcion: incrustarlos en base64
+    // los mete dentro del JS, los engorda un 33% y —lo que importa— anula
+    // la carga diferida, porque un data: URI ya viene descargado. Salen
+    // como archivos sueltos para que el navegador pida cada uno cuando
+    // toque y pueda cachearlos por separado.
+    //
+    // En el video no es una mejora, es la diferencia entre publicar o no:
+    // son 4 MB, y en base64 se irian a ~5,3 MB DENTRO del bundle de JS,
+    // que es codigo que bloquea el arranque. Descargado aparte, ni eso ni
+    // se pide hasta que la portada ya esta en pantalla.
+    assetsInlineLimit: (ruta) => !/\.(jpe?g|png|webp|avif|gif|mp4|webm|mov)$/i.test(ruta),
   },
 })

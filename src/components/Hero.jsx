@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { TituloHero } from './Texto.jsx'
 import { PlanoHero, Flecha } from './Dibujos.jsx'
+import RetratoHero from './RetratoHero.jsx'
 import { useSinMovimiento } from '../hooks/useMovimiento.js'
 
 /** Boton que se deja arrastrar por el cursor, con el tiron limitado. */
@@ -137,6 +138,12 @@ export default function Hero({ arrancar }) {
             </BotonIman>
             <a href="#contacto" className="enlace-simple sub">Conversemos un encargo</a>
           </motion.div>
+
+          {/* Va al final del DOM, no entre el titular y el texto, para que
+              el orden de lectura y el de tabulacion sigan siendo eyebrow →
+              titular → parrafo → llamada. La rejilla lo coloca a la derecha
+              en pantalla ancha; el orden del codigo no lo decide la vista. */}
+          <RetratoHero arrancar={arrancar} />
         </div>
       </motion.div>
 
