@@ -185,6 +185,30 @@ async function main() {
       retrato && Math.abs(retrato.w / retrato.h - 0.75) < 0.01,
       retrato ? (retrato.w / retrato.h).toFixed(3) : '—')
 
+    // Tiene que parecer una imagen que se mueve, no un reproductor. Lo que
+    // delataba el truco no era la barra de controles —nunca la hubo— sino
+    // el boton flotante de picture-in-picture que Chrome y Edge superponen
+    // al pasar el raton por encima de cualquier video.
+    const limpio = await page.evaluate(() => {
+      const v = document.querySelector('.retrato-hero video')
+      if (!v) return null
+      const c = v.getBoundingClientRect()
+      const encima = document.elementFromPoint(c.x + c.width / 2, c.y + c.height / 2)
+      return {
+        controles: v.hasAttribute('controls'),
+        pip: v.disablePictureInPicture,
+        remoto: v.disableRemotePlayback,
+        puntero: getComputedStyle(v).pointerEvents,
+        // Si el puntero llega al <video>, el navegador tiene donde colgar
+        // sus anadidos. Debe recibirlo el marco, no el video.
+        recibeElVideo: encima === v,
+      }
+    })
+    anota('El retrato no parece un reproductor: sin controles ni botones superpuestos',
+      limpio && !limpio.controles && limpio.pip && limpio.remoto &&
+      limpio.puntero === 'none' && !limpio.recibeElVideo,
+      limpio ? `controls:${limpio.controles} pip-off:${limpio.pip} pointer-events:${limpio.puntero}` : 'no hay vídeo')
+
     // Un hero sin su llamada a la accion no es un hero. Al colocar el
     // retrato a mano en la rejilla, los botones se fueron 300 px por
     // debajo del pliegue sin que nada fallara: la rejilla los recoloco.

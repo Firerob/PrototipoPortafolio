@@ -179,7 +179,20 @@ html { scroll-behavior: smooth; }
    En movil no se esconde: baja a tamano de firma, debajo de la llamada,
    como el retrato pequeno de un articulo. En pantalla ancha sube a la
    columna derecha, junto al parrafo y la llamada, y ahi manda. */
-.retrato-hero { grid-column: 1 / -1; margin: .5rem 0 0; max-width: 9rem; }
+.retrato-hero { grid-column: 1 / -1; margin: .5rem 0 0; max-width: 11rem; }
+
+/* El retrato es imagen, no reproductor: el puntero lo atraviesa. Sin hover
+   no hay boton flotante de picture-in-picture, ni cursor de "reproducible",
+   ni menu contextual de video. Ademas deja pasar el cursor propio del sitio
+   por encima sin que el navegador se meta. */
+.retrato-hero video { pointer-events: none; }
+/* Chrome y Edge dibujan sus anadidos en un shadow root propio; estos son
+   los ganchos que exponen para poder apagarlos. */
+.retrato-hero video::-webkit-media-controls,
+.retrato-hero video::-webkit-media-controls-enclosure,
+.retrato-hero video::-webkit-media-controls-panel,
+.retrato-hero video::-webkit-media-controls-start-playback-button,
+.retrato-hero video::-webkit-media-controls-overlay-play-button { display: none !important; }
 .retrato-hero figcaption {
   margin-top: .75rem; color: var(--body);
   font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
@@ -213,9 +226,12 @@ html { scroll-behavior: smooth; }
   /* Se dimensiona por ALTURA, no por ancho de columna. Es lo que decide
      si el hero cabe en una pantalla: fijada la altura, la proporcion 3:4
      deduce el ancho y el retrato no puede desbordar por abajo. El tope en
-     px evita que en un monitor muy alto se convierta en un poster. */
+     px evita que en un monitor muy alto se convierta en un poster.
+     480 px es el techo util: las filas 2-4 miden unos 525 px de alto, y
+     pasando de ahi el retrato estira la rejilla y los botones se vuelven
+     a ir por debajo del pliegue. La prueba de los botones lo vigila. */
   .retrato-hero .marco {
-    height: min(44svh, 400px); width: auto; margin-left: auto;
+    height: min(54svh, 480px); width: auto; margin-left: auto;
   }
   /* El plano deja de competir: pasa a ser textura detras del retrato en
      vez de un segundo foco al mismo nivel. */

@@ -57,6 +57,21 @@ export default function RetratoHero({ arrancar }) {
             loop
             playsInline
             preload="none"
+            // Esto no es "un video" para el visitante, es una imagen que se
+            // mueve. Nada debe delatar que hay un reproductor debajo:
+            //
+            //   sin `controls`   no hay barra
+            //   disablePicture…  quita el boton flotante que Chrome y Edge
+            //                    superponen al pasar el raton por encima
+            //   disableRemote…   quita el de enviar a Chromecast/AirPlay
+            //   controlsList     por si algun navegador decide mostrar
+            //                    controles igualmente
+            //
+            // El remate esta en CSS: pointer-events none. Si el puntero no
+            // puede tocarlo, no hay hover que dispare ningun anadido.
+            disablePictureInPicture
+            disableRemotePlayback
+            controlsList="nodownload nofullscreen noplaybackrate noremoteplayback"
             // El retrato no aporta informacion que no este en el texto de al
             // lado: es decorativo, y anunciarlo solo entorpece la lectura.
             aria-hidden="true"
