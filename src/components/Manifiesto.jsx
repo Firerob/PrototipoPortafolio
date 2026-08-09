@@ -12,9 +12,15 @@ const FRASE =
  * El anclaje es `position: sticky` puro, no un pin de JavaScript: el
  * navegador lo resuelve en el hilo del compositor y no pelea con el
  * scroll nativo. Es la unica seccion anclada de la pagina.
+ *
+ * La composicion es la de una cita de revista, no un parrafo centrado:
+ * rotulo y regla arriba, cita en el centro optico, atribucion abajo. Antes
+ * el texto ocupaba el 29% del alto de la caja y flotaba en medio de un
+ * rectangulo negro; ahora el contenido sujeta las tres alturas y el vacio
+ * pasa a ser margen deliberado en vez de hueco.
  */
 function Palabra({ palabra, rango, progreso }) {
-  const color = useTransform(progreso, rango, ['#D6D5D2', '#FFFFFF'])
+  const color = useTransform(progreso, rango, ['#8C8C89', '#FFFFFF'])
   return (
     <motion.span style={{ color }}>{palabra}{' '}</motion.span>
   )
@@ -32,6 +38,11 @@ export default function Manifiesto() {
 
   const palabras = FRASE.split(' ')
 
+  // La regla se dibuja sola conforme avanza la seccion: es la misma idea
+  // que la cota del plano del hero, y da al rotulo algo que hacer mientras
+  // la cita se enciende.
+  const anchoRegla = useTransform(scrollYProgress, [0, 0.35], ['0%', '100%'])
+
   const seguirFoco = (e) => {
     if (sinMovimiento || !foco.current) return
     const r = foco.current.parentElement.getBoundingClientRect()
@@ -40,34 +51,52 @@ export default function Manifiesto() {
   }
 
   return (
-    // El doble de alto que la ventana da recorrido al barrido sin que la
-    // seccion se sienta atascada.
+    // Un tramo de scroll por delante de la ventana: lo justo para que la
+    // frase se encienda entera sin que la seccion se sienta atascada.
+    // Antes eran 220vh, de los que 120 no mostraban nada.
     <section
       id="manifiesto"
       className="manifiesto oscuro"
       ref={ref}
-      style={{ height: sinMovimiento ? 'auto' : '220vh' }}
+      style={{ height: sinMovimiento ? 'auto' : '200vh' }}
       onMouseMove={seguirFoco}
       onMouseEnter={() => foco.current && (foco.current.style.opacity = '1')}
       onMouseLeave={() => foco.current && (foco.current.style.opacity = '0')}
     >
-      <div style={{ position: 'sticky', top: 0, overflow: 'hidden' }}>
+      <div className="mani-pegado">
         <div id="foco" ref={foco} aria-hidden="true" />
+
         <div className="wrap caja">
-          <p className="mani">
+          <header className="mani-rotulo">
+            <p className="eyebrow">Manifiesto</p>
             {sinMovimiento
-              ? FRASE
-              : palabras.map((p, i) => (
-                  <Palabra
-                    key={i}
-                    palabra={p}
-                    progreso={scrollYProgress}
-                    // Cada palabra se enciende en su propio tramo, solapado
-                    // con el de la siguiente para que la ola sea continua.
-                    rango={[i / palabras.length * 0.85, (i + 1) / palabras.length * 0.85 + 0.1]}
-                  />
-                ))}
-          </p>
+              ? <span className="mani-regla" style={{ width: '100%' }} aria-hidden="true" />
+              : <motion.span className="mani-regla" style={{ width: anchoRegla }} aria-hidden="true" />}
+          </header>
+
+          {/* blockquote + cite: es una cita, y decirlo en el marcado la
+              anuncia como tal a quien navega con lector de pantalla. */}
+          <blockquote className="mani">
+            <p>
+              {sinMovimiento
+                ? FRASE
+                : palabras.map((p, i) => (
+                    <Palabra
+                      key={i}
+                      palabra={p}
+                      progreso={scrollYProgress}
+                      // Cada palabra se enciende en su propio tramo, solapado
+                      // con el de la siguiente para que la ola sea continua.
+                      rango={[i / palabras.length * 0.85, (i + 1) / palabras.length * 0.85 + 0.1]}
+                    />
+                  ))}
+            </p>
+          </blockquote>
+
+          <footer className="mani-pie">
+            <cite>Marina Olivares, arquitecta</cite>
+            <span className="mani-desde">Estudio fundado en 2013</span>
+          </footer>
         </div>
       </div>
     </section>

@@ -267,7 +267,14 @@ html { scroll-behavior: smooth; }
   background: radial-gradient(340px circle at var(--fx, 50%) var(--fy, 50%), rgba(255,255,255,.09), transparent 70%);
   transition: opacity .4s ease;
 }
-.manifiesto { position: relative; overflow: hidden; }
+/* Sin `overflow: hidden`. Lo tenia, y era lo que rompia la seccion: un
+   ancestro con overflow distinto de visible se convierte en contenedor de
+   scroll, y entonces el hijo `position: sticky` se ancla respecto a EL —que
+   no scrollea— en vez de respecto a la ventana. El anclaje no llegaba a
+   activarse nunca: el texto se iba a los 500 px y detras quedaban 1400 px
+   de negro. El recorte que hacia falta ya lo hace el propio contenedor
+   pegajoso, que lleva su overflow hidden. */
+.manifiesto { position: relative; }
 @media (prefers-reduced-motion: reduce) { #foco { display: none; } }
 
 /* ── Marquesina ──────────────────────────────────────────── */
@@ -381,12 +388,54 @@ html { scroll-behavior: smooth; }
 
 /* ── Manifiesto (contrapunto oscuro, única sección anclada) ── */
 .manifiesto { background: var(--ink); color: var(--paper); }
-.manifiesto .caja { min-height: 100vh; display: flex; align-items: center; padding-block: 6rem; max-width: 1200px; }
-.mani {
-  font-weight: 200; letter-spacing: -.01em;
-  font-size: clamp(1.5rem, 4.2vw, 3.25rem); line-height: 1.25;
+.mani-pegado { position: sticky; top: 0; overflow: hidden; }
+
+/* Tres alturas, no una. `1fr` en el centro empuja rotulo y pie contra los
+   extremos, asi que la cita cae en el centro optico y el vacio queda
+   repartido como margen en vez de amontonado arriba y abajo. */
+/* El padding superior descuenta la navegacion fija (5rem, 6rem desde 768).
+   Al estar la seccion pegada al top de la ventana, sin ese descuento el
+   rotulo nace justo debajo de la barra y se lee como si la tocara. */
+.manifiesto .caja {
+  min-height: 100svh; padding-block: 7rem 5rem;
+  display: grid; grid-template-rows: auto 1fr auto; gap: 3rem;
 }
-.mani span { color: var(--sand); }
+@media (min-width: 768px) { .manifiesto .caja { padding-block: 9rem 6rem; gap: 4rem; } }
+
+/* Rotulo: la seccion era la unica del sitio sin uno. La regla lo remata
+   y ocupa el ancho sobrante, que es lo que hace que la linea superior lea
+   como cabecera de pagina y no como una palabra suelta. */
+.mani-rotulo { display: flex; align-items: center; gap: 1.5rem; }
+.mani-rotulo .eyebrow { color: var(--sand); flex-shrink: 0; }
+.mani-regla { display: block; height: 1px; background: rgba(214,213,210,.35); }
+
+/* La cita manda: sube de 3.25 a 4rem y se queda en 18 palabras por linea
+   como maximo, que es donde el ojo todavia vuelve solo al margen. */
+.mani {
+  margin: 0; align-self: center;
+  font-weight: 200; letter-spacing: -.015em;
+  font-size: clamp(1.6rem, 4.6vw, 4rem); line-height: 1.2;
+  max-width: 20ch; text-wrap: balance;
+}
+@media (min-width: 768px) { .mani { max-width: 24ch; } }
+@media (min-width: 1280px) { .mani { max-width: 26ch; } }
+.mani p { margin: 0; }
+/* Las palabras aun sin encender: 6.6:1 sobre el fondo. No es un estado
+   "apagado" que haya que descifrar —se lee perfectamente desde el
+   principio—, solo un contraste menor que el de las ya encendidas. */
+.mani span { color: #8C8C89; }
+
+/* Pie: cierra la composicion contra el borde inferior. En pantalla ancha
+   la atribucion se va a la derecha, debajo del final de la cita, que es
+   donde la busca el ojo al terminar de leer. */
+.mani-pie {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  justify-content: space-between; gap: .5rem 2rem;
+  padding-top: 1.5rem; border-top: 1px solid rgba(214,213,210,.18);
+  font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
+}
+.mani-pie cite { font-style: normal; color: var(--paper); }
+.mani-desde { color: var(--sand); }
 
 /* ── Estudio ─────────────────────────────────────────────── */
 .estudio { background: var(--paper); border-bottom: 1px solid var(--sand); }

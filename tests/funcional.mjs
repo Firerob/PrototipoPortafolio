@@ -446,8 +446,59 @@ async function main() {
     await pausa(800)
 
     // ── Manifiesto ─────────────────────────────────────────────
-    anota('El manifiesto se ancla con position:sticky',
-      await page.$eval('#manifiesto > div', (n) => getComputedStyle(n).position === 'sticky'))
+    // Esta comprobacion miraba `getComputedStyle().position === 'sticky'`,
+    // que es la propiedad, no el comportamiento. Y pasaba estando roto:
+    // `.manifiesto` tenia `overflow: hidden`, que lo convertia en contenedor
+    // de scroll, y el hijo se anclaba respecto a el —que no scrollea— en vez
+    // de respecto a la ventana. El texto se iba a los 500 px y detras
+    // quedaban 1400 px de negro. Ahora se mide lo unico que importa: que al
+    // avanzar por la seccion el contenedor NO se mueva de la pantalla.
+    const recorridoManifiesto = await page.evaluate(async () => {
+      const s = document.getElementById('manifiesto')
+      const previo = document.documentElement.style.scrollBehavior
+      document.documentElement.style.scrollBehavior = 'auto'
+      // El anclaje dura lo que sobra de seccion por encima de la ventana;
+      // pasado eso el contenedor DEBE despegarse y dejar salir la seccion.
+      // Se muestrea dentro de ese tramo, no en offsets fijos, para que la
+      // prueba no dependa del alto de la ventana con la que se ejecute.
+      const recorrido = s.getBoundingClientRect().height - window.innerHeight
+      const tomas = []
+      for (const f of [0, 0.3, 0.6, 0.95]) {
+        const d = Math.round(recorrido * f)
+        window.scrollTo(0, s.offsetTop + d)
+        await new Promise((r) => setTimeout(r, 250))
+        const pegado = document.querySelector('.mani-pegado').getBoundingClientRect()
+        const cita = document.querySelector('.mani').getBoundingClientRect()
+        tomas.push({
+          d,
+          top: Math.round(pegado.top),
+          visible: cita.bottom > 0 && cita.top < window.innerHeight,
+        })
+      }
+      document.documentElement.style.scrollBehavior = previo
+      return tomas
+    })
+    anota('El manifiesto se queda anclado mientras se recorre',
+      recorridoManifiesto.every((t) => Math.abs(t.top) <= 2),
+      recorridoManifiesto.map((t) => `+${t.d}→y${t.top}`).join(' '))
+    anota('La cita nunca se va de la pantalla dentro de su sección',
+      recorridoManifiesto.every((t) => t.visible),
+      `${recorridoManifiesto.filter((t) => t.visible).length}/4 posiciones`)
+
+    // La composicion editorial: rotulo arriba, cita en medio, pie abajo.
+    // Antes el texto flotaba solo y ocupaba el 29% del alto de la caja.
+    const composicion = await page.evaluate(() => {
+      const caja = document.querySelector('.manifiesto .caja').getBoundingClientRect()
+      const rot = document.querySelector('.mani-rotulo').getBoundingClientRect()
+      const pie = document.querySelector('.mani-pie').getBoundingClientRect()
+      return {
+        ocupacion: Math.round(((pie.bottom - rot.top) / caja.height) * 100),
+        cita: !!document.querySelector('.manifiesto blockquote cite, .manifiesto cite'),
+      }
+    })
+    anota('La sección está compuesta, no es un párrafo flotando',
+      composicion.ocupacion > 60 && composicion.cita,
+      `el contenido ocupa el ${composicion.ocupacion}% del alto (antes 29%)`)
 
     const leerColor = () => page.$eval('.mani span:nth-child(3)', (n) => getComputedStyle(n).color)
     await page.evaluate(() => {
