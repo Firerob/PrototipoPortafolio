@@ -22,10 +22,19 @@ import { useSinMovimiento } from './useMovimiento.js'
  *   </article>
  *
  * Con movimiento reducido devuelve 'visible' desde el primer render.
+ *
+ * `margin` adelanta el disparo mientras el elemento todavia esta debajo
+ * del viewport (mismo formato que rootMargin: "arriba derecha abajo
+ * izquierda"). Sin esto, la animacion —de duracion fija— se dispara justo
+ * al cruzar el borde, y en un scroll rapido el elemento ya salio de
+ * pantalla antes de que la transicion alcance a jugarse entera: se ve
+ * "rapida" no porque la duracion cambie, sino porque no queda tiempo en
+ * pantalla para verla completa. Adelantar el disparo le da ese tiempo
+ * siempre, sea cual sea la velocidad del scroll.
  */
-export function useAparicion({ once = true, amount = 0.25 } = {}) {
+export function useAparicion({ once = true, amount = 0.25, margin = '0px 0px 200px 0px' } = {}) {
   const ref = useRef(null)
   const sinMovimiento = useSinMovimiento()
-  const aLaVista = useInView(ref, { once, amount })
+  const aLaVista = useInView(ref, { once, amount, margin })
   return [ref, sinMovimiento || aLaVista ? 'visible' : 'oculto']
 }

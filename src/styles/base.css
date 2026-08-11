@@ -173,7 +173,7 @@ html { scroll-behavior: smooth; }
 @media (min-width: 768px) {
   .hero {
     min-height: 92svh; display: flex; align-items: flex-end;
-    padding-top: 8rem; padding-bottom: 4rem;
+    padding-top: 8rem; padding-bottom: 6rem;
   }
 }
 
@@ -196,7 +196,7 @@ html { scroll-behavior: smooth; }
    de siempre, mas denso donde vive el resto del texto. */
 .hero-velo {
   display: block; position: absolute; inset: 0;
-  background: linear-gradient(0deg, rgba(240,239,235,.85) 0%, rgba(240,239,235,0) 60%);
+  background: linear-gradient(0deg, rgba(240,239,235,.5) 0%, rgba(240,239,235,0) 60%);
 }
 @media (min-width: 768px) {
   .hero-velo {
@@ -209,13 +209,13 @@ html { scroll-behavior: smooth; }
 /* Solo en movil: el titulo sale del flujo de .wrap y se sube encima del
    video que queda justo arriba, alineado a la izquierda. El resto
    (eyebrow, parrafo, CTA) sigue tal cual, debajo, en flujo normal —
-   quitar el titulo de ahi no les deja hueco que llenar. -8rem es una
-   aproximacion: sube lo bastante para caer en la mitad inferior del
+   quitar el titulo de ahi no les deja hueco que llenar. -11rem es una
+   aproximacion: sube lo bastante para caer mas o menos a la mitad del
    video en los anchos de telefono habituales (360-430px). */
 .hero .wrap { position: relative; }
 .hero h1 {
   grid-column: 1 / -1;
-  position: absolute; left: var(--pad); right: var(--pad); top: -8rem; z-index: 1;
+  position: absolute; left: var(--pad); right: var(--pad); top: -11rem; z-index: 1;
 }
 @media (min-width: 768px) {
   .hero h1 { position: static; left: auto; right: auto; top: auto; z-index: auto; }
@@ -223,7 +223,12 @@ html { scroll-behavior: smooth; }
 @media (min-width: 1024px) { .hero h1 { grid-column: 1 / span 10; } }
 .hero .c-lead { grid-column: 1 / -1; }
 @media (min-width: 768px)  { .hero .c-lead { grid-column: 1 / span 7; } }
-@media (min-width: 1024px) { .hero .c-lead { grid-column: 1 / span 5; } }
+@media (min-width: 1024px) {
+  /* En pantallas grandes el video de fondo gana presencia y el parrafo,
+     con su tamaño de siempre, queda chico a su lado. Solo aqui se le da
+     mas cuerpo; el resto de usos de .lead (Estudio) no se toca. */
+  .hero .c-lead { grid-column: 1 / span 5; font-size: clamp(1.15rem, 1.5vw, 1.375rem); }
+}
 .hero .c-cta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2rem; padding-top: .5rem; }
 
 /* ── Titulares partidos en letras ──────────────────────────
@@ -525,6 +530,12 @@ html { scroll-behavior: smooth; }
    siempre termine de leerse dentro de la pantalla. */
 @media (max-width: 640px) {
   .relato-capa { gap: 1rem; }
+  /* Sin un ancho propio, la capa se encoge a lo que pida su contenido
+     —una foto o un texto mas angostos que 84vw— y el panel entero queda
+     mas chico que la pista, pegado a la izquierda: se ve descentrado,
+     con mas aire a un lado que al otro. Fijar el ancho al de la pista
+     hace que el centrado de la capa centre de verdad en pantalla. */
+  .relato-panel--media .relato-capa { width: calc(100vw - 3rem); }
   .relato-media-marco { height: min(32svh, 17rem); }
   .relato-media-el { max-width: 84vw; }
   .relato-media-texto { max-width: 84vw; }
