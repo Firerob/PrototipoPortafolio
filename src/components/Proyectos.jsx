@@ -5,10 +5,11 @@ import { useAparicion } from '../hooks/useAparicion.js'
 import Revelar from './Revelar.jsx'
 import { TituloPartido } from './Texto.jsx'
 import ImagenZoom from './ImagenZoom.jsx'
+import ProyectoModal from './ProyectoModal.jsx'
 import { useSinMovimiento } from '../hooks/useMovimiento.js'
 
 /** Tarjeta que se inclina hacia el cursor y descubre su dibujo con una cortina. */
-function Tarjeta({ proyecto, indice }) {
+function Tarjeta({ proyecto, indice, onAbrir }) {
   const sinMovimiento = useSinMovimiento()
   const ref = useRef(null)
   // El observador va en la tarjeta entera, NO en el marco.
@@ -40,9 +41,10 @@ function Tarjeta({ proyecto, indice }) {
   const inclinar = (e) => {
     if (sinMovimiento) return
     const r = ref.current.getBoundingClientRect()
-    // 7 grados es el techo: mas alla el dibujo se deforma y se nota el truco
-    rotX.set(((e.clientY - r.top) / r.height - 0.5) * -7)
-    rotY.set(((e.clientX - r.left) / r.width - 0.5) * 7)
+    // 9 grados: un poco mas sensible que el techo original (7), pero
+    // todavia lejos de donde el dibujo se deforma y se nota el truco.
+    rotX.set(((e.clientY - r.top) / r.height - 0.5) * -9)
+    rotY.set(((e.clientX - r.left) / r.width - 0.5) * 9)
   }
   const enderezar = () => { rotX.set(0); rotY.set(0) }
 
@@ -58,7 +60,13 @@ function Tarjeta({ proyecto, indice }) {
       exit={{ opacity: 0, scale: 0.96, y: -8 }}
       transition={{ duration: 0.45, delay: indice * 0.06, ease: [0.34, 1.3, 0.64, 1] }}
     >
-      <a href="#" ref={ref} onMouseMove={inclinar} onMouseLeave={enderezar}>
+      <button
+        type="button"
+        ref={ref}
+        onMouseMove={inclinar}
+        onMouseLeave={enderezar}
+        onClick={() => onAbrir(proyecto, ref.current)}
+      >
         <motion.div
           className={`marco ${proyecto.proporcion}`}
           style={sinMovimiento ? undefined : { rotateX: srx, rotateY: sry }}
@@ -96,7 +104,7 @@ function Tarjeta({ proyecto, indice }) {
           </div>
           <span className="num">{String(indice + 1).padStart(2, '0')}</span>
         </div>
-      </a>
+      </button>
     </motion.article>
   )
 }
@@ -104,6 +112,17 @@ function Tarjeta({ proyecto, indice }) {
 export default function Proyectos() {
   const [filtro, setFiltro] = useState('todos')
   const visibles = proyectos.filter((p) => filtro === 'todos' || p.categoria === filtro)
+
+  // El proyecto abierto y el elemento que lo disparo, para devolver el
+  // foco ahi al cerrar.
+  const [abierto, setAbierto] = useState(null)
+  const disparadorRef = useRef(null)
+
+  const abrir = (proyecto, elemento) => {
+    disparadorRef.current = elemento
+    setAbierto(proyecto)
+  }
+  const cerrar = () => setAbierto(null)
 
   return (
     <section id="proyectos" className="seccion">
@@ -141,7 +160,7 @@ export default function Proyectos() {
         <motion.div className="g12 grilla" layout>
           <AnimatePresence mode="popLayout">
             {visibles.map((p, i) => (
-              <Tarjeta key={p.id} proyecto={p} indice={i} />
+              <Tarjeta key={p.id} proyecto={p} indice={i} onAbrir={abrir} />
             ))}
           </AnimatePresence>
         </motion.div>
@@ -150,6 +169,16 @@ export default function Proyectos() {
           <p className="vacio visible">No hay proyectos en esta categoría todavía.</p>
         )}
       </div>
+
+      <AnimatePresence>
+        {abierto && (
+          <ProyectoModal
+            proyecto={abierto}
+            onClose={cerrar}
+            disparador={disparadorRef.current}
+          />
+        )}
+      </AnimatePresence>
     </section>
   )
 }

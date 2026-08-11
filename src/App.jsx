@@ -14,16 +14,6 @@ import Proceso from './components/Proceso.jsx'
 import Contacto from './components/Contacto.jsx'
 import { useSinMovimiento } from './hooks/useMovimiento.js'
 
-/** Los titulos que desfilan en la primera fase de la intro. */
-const PROYECTOS_INTRO = [
-  'Casa Ladera',
-  'Pabellón Lumen',
-  'Refugio Andino',
-  'Mercado Central',
-  'Silo',
-  'Biblioteca del Río',
-]
-
 export default function App() {
   const sinMovimiento = useSinMovimiento()
 
@@ -40,11 +30,10 @@ export default function App() {
           vea: montarlo solo al subir la cortina obligaria al navegador a
           maquetar la pagina entera en ese momento y se veria el salto. */}
       <Preloader
-        palabras={PROYECTOS_INTRO}
         nombre={['Marina', 'Olivares']}
-        msFasePalabras={1800}
-        msFaseNombre={900}
-        onCompletado={() => setIsLoaded(true)}
+        soloNombre
+        msFaseNombre={1400}
+        onSalida={() => setIsLoaded(true)}
       />
 
       <Progreso />

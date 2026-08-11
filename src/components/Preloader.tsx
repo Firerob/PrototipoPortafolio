@@ -39,6 +39,15 @@ export interface PreloaderProps {
   msFaseNombre?: number
   /** Se llama cuando la cortina ya salio y el componente se desmonto. */
   onCompletado?: () => void
+  /** Se llama en el instante en que ARRANCA la salida, no cuando termina.
+   * Pensado para que lo que hay detras (el hero) empiece a animarse a la
+   * vez que la cortina se retira, en vez de esperar a que desaparezca del
+   * todo: si arrancara con onCompletado, la cortina primero descubre un
+   * hero quieto durante sus 800ms de salida, y solo entonces arranca el
+   * texto — un hueco muerto entre dos animaciones que deberian ser una. */
+  onSalida?: () => void
+  /** Salta la fase 1 y arranca directo en el nombre. Por defecto false. */
+  soloNombre?: boolean
   /** Muestra la apertura una sola vez por pestaña. Por defecto false. */
   soloUnaVezPorSesion?: boolean
   /** Clave de sessionStorage cuando la opcion anterior esta activa. */
@@ -58,6 +67,8 @@ export default function Preloader({
   msFasePalabras = 2500,
   msFaseNombre = 1300,
   onCompletado,
+  onSalida,
+  soloNombre = false,
   soloUnaVezPorSesion = false,
   claveSesion = 'apertura-vista',
   textoSaltar = 'Saltar',
@@ -73,7 +84,7 @@ export default function Preloader({
     return true
   })
 
-  const [fase, setFase] = useState<Fase>('palabras')
+  const [fase, setFase] = useState<Fase>(soloNombre ? 'nombre' : 'palabras')
   const [indice, setIndice] = useState(0)
   const relojes = useRef<number[]>([])
 
@@ -111,6 +122,11 @@ export default function Preloader({
     relojes.current.push(aSalida)
     return () => window.clearTimeout(aSalida)
   }, [visible, fase, msFaseNombre])
+
+  useEffect(() => {
+    if (!visible || fase !== 'saliendo') return
+    onSalida?.()
+  }, [visible, fase, onSalida])
 
   useEffect(() => {
     if (!visible || fase !== 'saliendo') return
@@ -226,8 +242,8 @@ export default function Preloader({
                         visible: { y: 0 },
                       }}
                       transition={{
-                        duration: 0.9,
-                        delay: i * 0.12,
+                        duration: 1,
+                        delay: i * 0.14,
                         ease: [0.16, 1, 0.3, 1],
                       }}
                     >

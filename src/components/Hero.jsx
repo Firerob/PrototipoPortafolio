@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import { TituloHero } from './Texto.jsx'
-import { PlanoHero, Flecha } from './Dibujos.jsx'
-import RetratoHero from './RetratoHero.jsx'
+import { Flecha } from './Dibujos.jsx'
 import { useSinMovimiento } from '../hooks/useMovimiento.js'
+import posterHero from '../assets/fotos/marina-hero-poster.jpg'
+import finalHero from '../assets/fotos/marina-hero-final.jpg'
+import clipHero from '../assets/video/marina-hero.mp4'
 
 /** Boton que se deja arrastrar por el cursor, con el tiron limitado. */
 function BotonIman({ children, href }) {
@@ -41,10 +43,9 @@ function BotonIman({ children, href }) {
 export default function Hero({ arrancar }) {
   const sinMovimiento = useSinMovimiento()
   const seccion = useRef(null)
-  const plano = useRef(null)
+  const video = useRef(null)
 
-  // Parallax de scroll y del raton en elementos distintos, para que no
-  // compitan por la misma matriz de transformacion.
+  // Parallax de scroll sobre el fondo.
   const { scrollYProgress } = useScroll({
     target: seccion,
     offset: ['start start', 'end start'],
@@ -58,48 +59,33 @@ export default function Hero({ arrancar }) {
   const yHero = useTransform(scrollYProgress, [0, 1], [0, -60])
   const anchoRiel = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
 
-  const rx = useMotionValue(0)
-  const ry = useMotionValue(0)
-  const muelle = { stiffness: 60, damping: 20 }
-  const planoX = useSpring(rx, muelle)
-  const planoY = useSpring(ry, muelle)
-
+  // La carga arranca desde el primer instante, aunque el video no se vea:
+  // la intro tarda bastante mas de dos segundos, tiempo de sobra para que
+  // el archivo (medio MB) ya este listo cuando arrancar pase a true. Sin
+  // esto el <video> empezaba a pedir el archivo justo en ese momento, y la
+  // espera de red se notaba como un instante muerto nada mas abrir el sitio.
   useEffect(() => {
-    if (sinMovimiento || !window.matchMedia('(pointer: fine)').matches) return
-    const mover = (e) => {
-      rx.set((e.clientX / window.innerWidth - 0.5) * -46)
-      ry.set((e.clientY / window.innerHeight - 0.5) * -30)
-    }
-    window.addEventListener('mousemove', mover, { passive: true })
-    return () => window.removeEventListener('mousemove', mover)
-  }, [rx, ry, sinMovimiento])
+    if (sinMovimiento) return
+    const el = video.current
+    if (!el || el.src) return
+    el.src = clipHero
+    el.load()
+  }, [sinMovimiento])
 
-  // El trazo se dibuja solo: cada linea arranca con su longitud completa
-  // como hueco y la va cerrando.
+  // El clip corre una sola vez, sin loop: arranca al terminar la intro y se
+  // queda en su ultimo fotograma —ella ya volteada hacia la camara—, que es
+  // el estado de reposo del hero. No hace falta reiniciarlo ni ocultarlo al
+  // terminar: un <video> sin loop simplemente se detiene ahi.
   useEffect(() => {
-    if (sinMovimiento || !plano.current) return
-    const trazos = plano.current.querySelectorAll('.tr')
-    trazos.forEach((t) => {
-      const largo = t.getTotalLength?.() ?? 0
-      if (!largo) return
-      t.style.strokeDasharray = largo
-      t.style.strokeDashoffset = largo
-      t.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.22,.61,.36,1)'
-    })
-    const id = setTimeout(() => {
-      trazos.forEach((t, i) => {
-        t.style.transitionDelay = `${i * 0.08}s`
-        t.style.strokeDashoffset = 0
-      })
-    }, arrancar ? 100 : 600)
-    return () => clearTimeout(id)
+    if (sinMovimiento || !arrancar) return
+    video.current?.play?.().catch(() => {})
   }, [arrancar, sinMovimiento])
 
   const aparece = {
     hidden: { opacity: 0, y: 22 },
     show: (i) => ({
       opacity: 1, y: 0,
-      transition: { duration: 0.7, delay: 0.35 + i * 0.09, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 1.1, delay: i * 0.5, ease: [0.16, 1, 0.3, 1] },
     }),
   }
   const estado = arrancar ? 'show' : 'hidden'
@@ -108,10 +94,25 @@ export default function Hero({ arrancar }) {
     <section id="inicio" className="hero" ref={seccion}>
       <div className="hero-fondo" aria-hidden="true">
         <motion.div id="parallax" style={{ y: yScroll }}>
-          <motion.div ref={plano} style={{ x: planoX, y: planoY }}>
-            <PlanoHero />
-          </motion.div>
+          {sinMovimiento ? (
+            <img className="hero-video" src={finalHero} alt="" width="1280" height="720" />
+          ) : (
+            <video
+              ref={video}
+              className="hero-video"
+              poster={posterHero}
+              width="1280"
+              height="720"
+              muted
+              playsInline
+              preload="auto"
+              disablePictureInPicture
+              disableRemotePlayback
+              controlsList="nodownload nofullscreen noplaybackrate noremoteplayback"
+            />
+          )}
         </motion.div>
+        <div className="hero-velo" />
       </div>
 
       <motion.div className="wrap"
@@ -138,12 +139,6 @@ export default function Hero({ arrancar }) {
             </BotonIman>
             <a href="#contacto" className="enlace-simple sub">Conversemos un encargo</a>
           </motion.div>
-
-          {/* Va al final del DOM, no entre el titular y el texto, para que
-              el orden de lectura y el de tabulacion sigan siendo eyebrow →
-              titular → parrafo → llamada. La rejilla lo coloca a la derecha
-              en pantalla ancha; el orden del codigo no lo decide la vista. */}
-          <RetratoHero arrancar={arrancar} />
         </div>
       </motion.div>
 

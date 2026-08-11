@@ -158,90 +158,88 @@ html { scroll-behavior: smooth; }
 
 .enlace-simple { font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); padding-block: .75rem; display: inline-block; }
 
-/* ── Hero ────────────────────────────────────────────────── */
+/* ── Hero ────────────────────────────────────────────────── │
+   El video 16:9 no puede ser fondo de un hero a pantalla completa en
+   movil sin perder casi todo su encuadre: cubrir un cajon tan alto y
+   angosto exige un zoom brutal. Por eso el layout se bifurca:
+     - movil: el video es un bloque en su proporcion real, arriba del
+       hero, en flujo normal; el texto va debajo, sobre el fondo claro.
+     - >=768px: el video vuelve a ser el fondo completo con su velo,
+       como antes; hay espacio de sobra para cubrir sin deformar. */
 .hero {
-  position: relative; min-height: 92svh; display: flex; align-items: flex-end;
-  padding-top: 8rem; padding-bottom: 4rem; overflow: hidden;
+  position: relative; overflow: hidden;
+  padding-top: 5.5rem; padding-bottom: 3rem;
 }
-.hero-fondo { position: absolute; inset: 0; z-index: -1; }
+@media (min-width: 768px) {
+  .hero {
+    min-height: 92svh; display: flex; align-items: flex-end;
+    padding-top: 8rem; padding-bottom: 4rem;
+  }
+}
+
+.hero-fondo { position: relative; overflow: hidden; aspect-ratio: 16 / 9; margin-bottom: 2rem; }
+@media (min-width: 768px) {
+  .hero-fondo { position: absolute; inset: 0; z-index: -1; aspect-ratio: auto; margin-bottom: 0; }
+}
+
 #parallax { position: absolute; inset: 0; will-change: transform; }
-#plano { position: absolute; right: -8%; top: 6%; width: 62%; max-width: 820px; opacity: .55; }
+
+/* En movil la proporcion del bloque ya es la del video: cover no recorta
+   casi nada. En escritorio cubre un cajon mucho mas alto que ancho que su
+   propia proporcion, y ahi si hace falta subir el encuadre hacia la cara. */
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 32%; }
+
+/* Velo tibio del mismo tono que el fondo del sitio, apenas insinuado: solo
+   lo necesario para que el texto oscuro no pierda el contraste con el que
+   fue pensado, sin lavar el video. En movil se apila abajo, detras del
+   titulo que se sube ahi encima; en escritorio es el barrido horizontal
+   de siempre, mas denso donde vive el resto del texto. */
+.hero-velo {
+  display: block; position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(240,239,235,.85) 0%, rgba(240,239,235,0) 60%);
+}
+@media (min-width: 768px) {
+  .hero-velo {
+    background: linear-gradient(100deg, rgba(240,239,235,.55) 0%, rgba(240,239,235,.32) 42%, rgba(240,239,235,.08) 100%);
+  }
+}
 .hero .g12 { row-gap: 2.5rem; }
 .hero .c-eyebrow { grid-column: 1 / -1; }
-.hero h1 { grid-column: 1 / -1; }
+
+/* Solo en movil: el titulo sale del flujo de .wrap y se sube encima del
+   video que queda justo arriba, alineado a la izquierda. El resto
+   (eyebrow, parrafo, CTA) sigue tal cual, debajo, en flujo normal —
+   quitar el titulo de ahi no les deja hueco que llenar. -8rem es una
+   aproximacion: sube lo bastante para caer en la mitad inferior del
+   video en los anchos de telefono habituales (360-430px). */
+.hero .wrap { position: relative; }
+.hero h1 {
+  grid-column: 1 / -1;
+  position: absolute; left: var(--pad); right: var(--pad); top: -8rem; z-index: 1;
+}
+@media (min-width: 768px) {
+  .hero h1 { position: static; left: auto; right: auto; top: auto; z-index: auto; }
+}
 @media (min-width: 1024px) { .hero h1 { grid-column: 1 / span 10; } }
 .hero .c-lead { grid-column: 1 / -1; }
 @media (min-width: 768px)  { .hero .c-lead { grid-column: 1 / span 7; } }
 @media (min-width: 1024px) { .hero .c-lead { grid-column: 1 / span 5; } }
 .hero .c-cta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2rem; padding-top: .5rem; }
 
-/* ── Retrato del hero ──────────────────────────────────────
-   En movil no se esconde: baja a tamano de firma, debajo de la llamada,
-   como el retrato pequeno de un articulo. En pantalla ancha sube a la
-   columna derecha, junto al parrafo y la llamada, y ahi manda. */
-.retrato-hero { grid-column: 1 / -1; margin: .5rem 0 0; max-width: 11rem; }
-
-/* El retrato es imagen, no reproductor: el puntero lo atraviesa. Sin hover
-   no hay boton flotante de picture-in-picture, ni cursor de "reproducible",
-   ni menu contextual de video. Ademas deja pasar el cursor propio del sitio
-   por encima sin que el navegador se meta. */
-.retrato-hero video { pointer-events: none; }
-/* Chrome y Edge dibujan sus anadidos en un shadow root propio; estos son
-   los ganchos que exponen para poder apagarlos. */
-.retrato-hero video::-webkit-media-controls,
-.retrato-hero video::-webkit-media-controls-enclosure,
-.retrato-hero video::-webkit-media-controls-panel,
-.retrato-hero video::-webkit-media-controls-start-playback-button,
-.retrato-hero video::-webkit-media-controls-overlay-play-button { display: none !important; }
-.retrato-hero figcaption {
-  margin-top: .75rem; color: var(--body);
-  font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
-  opacity: 0; transition: opacity var(--t-mid) var(--ease);
-}
-/* El pie aparece cuando el video ya corre, no antes: anunciar a alguien
-   debajo de un hueco gris es peor que no anunciar nada. */
-.retrato-hero figcaption.visible { opacity: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .retrato-hero figcaption { opacity: 1; transition: none; }
-}
-
-@media (min-width: 1024px) {
-  /* Con el retrato colocado a mano hay que colocar TODO a mano.
-     Al fijarlo en las filas 2-4 de las columnas 9-12, el titular —que
-     llegaba hasta la columna 10— dejaba de caber en esas filas, y la
-     colocacion automatica hace lo unico que puede: bajarlo a una fila
-     nueva. Se llevaba por delante al parrafo y a los botones, que
-     acababan fuera de la pantalla. Con filas explicitas no hay nada que
-     adivinar, y el titular se recorta a ocho columnas para no invadir
-     la del retrato. */
-  .hero .c-eyebrow { grid-row: 1; }
-  .hero h1         { grid-row: 2; grid-column: 1 / span 8; }
-  .hero .c-lead    { grid-row: 3; }
-  .hero .c-cta     { grid-row: 4; grid-column: 1 / span 8; }
-
-  .retrato-hero {
-    grid-column: 9 / -1; grid-row: 2 / span 3;
-    max-width: none; margin: 0; align-self: end;
+/* Solo tiene sentido cuando el hero ocupa la pantalla entera: en movil,
+   corto y en flujo normal, la propia maqueta ya dice que hay mas debajo.
+   El velo del fondo se disuelve justo en esta esquina —ahi el video queda
+   mas al descubierto—, asi que el indicador lleva su propio respaldo en
+   vez de fiarse del degradado que lo protege en el resto del hero. */
+.indicador { display: none; }
+@media (min-width: 768px) {
+  .indicador {
+    display: flex; position: absolute; bottom: 2rem; right: var(--pad);
+    align-items: center; gap: .75rem;
+    padding: .5rem .9rem; border-radius: 999px;
+    background: rgba(240,239,235,.85); backdrop-filter: blur(6px);
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--body);
   }
-  /* Se dimensiona por ALTURA, no por ancho de columna. Es lo que decide
-     si el hero cabe en una pantalla: fijada la altura, la proporcion 3:4
-     deduce el ancho y el retrato no puede desbordar por abajo. El tope en
-     px evita que en un monitor muy alto se convierta en un poster.
-     480 px es el techo util: las filas 2-4 miden unos 525 px de alto, y
-     pasando de ahi el retrato estira la rejilla y los botones se vuelven
-     a ir por debajo del pliegue. La prueba de los botones lo vigila. */
-  .retrato-hero .marco {
-    height: min(54svh, 480px); width: auto; margin-left: auto;
-  }
-  /* El plano deja de competir: pasa a ser textura detras del retrato en
-     vez de un segundo foco al mismo nivel. */
-  #plano { opacity: .3; }
-}
-
-.indicador {
-  position: absolute; bottom: 2rem; right: var(--pad);
-  display: flex; align-items: center; gap: .75rem;
-  font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--body);
 }
 .riel { display: block; position: relative; width: 40px; height: 1px; background: var(--sand); overflow: hidden; }
 .riel span { position: absolute; inset: 0; background: var(--ink); }
@@ -257,8 +255,15 @@ html { scroll-behavior: smooth; }
 /* Enlaces de navegación: la onda recorre las letras al pasar por encima */
 .roll .ltr { will-change: transform; }
 
-/* Tarjetas que se inclinan hacia el cursor */
-.card a { display: block; perspective: 900px; }
+/* Tarjetas que se inclinan hacia el cursor. Es un <button>, no un <a>: no
+   hay pagina a la que ir, abre el modal de detalle. El reset deshace lo
+   que un boton trae por defecto para que se comporte igual que el enlace
+   que reemplazo. */
+.card a, .card button {
+  display: block; width: 100%; perspective: 900px;
+  background: none; border: 0; padding: 0; margin: 0;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
 .marco { transform-style: preserve-3d; }
 
 /* Foco de luz que sigue al cursor sobre el manifiesto */
@@ -277,14 +282,25 @@ html { scroll-behavior: smooth; }
 .manifiesto { position: relative; }
 @media (prefers-reduced-motion: reduce) { #foco { display: none; } }
 
-/* ── Marquesina ──────────────────────────────────────────── */
-.tira { border-block: 1px solid var(--sand); padding-block: 1.5rem; overflow: hidden; }
+/* ── Marquesina ──────────────────────────────────────────── │
+   Franja demasiado angosta para una mancha: aqui el tercer color va
+   plano, de pared a pared, en vez de en un punto. */
+.tira { border-block: 1px solid var(--sand); padding-block: 1.5rem; overflow: hidden; background: rgba(214,212,201,.22); }
 .tira-pista { display: flex; gap: 3rem; white-space: nowrap; will-change: transform; }
 .tira-grupo { display: flex; gap: 3rem; flex-shrink: 0; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); }
 .punto { color: var(--sand); }
 
 /* ── Cifras ──────────────────────────────────────────────── */
-.cifras { border-bottom: 1px solid var(--sand); }
+.cifras { border-bottom: 1px solid var(--sand); position: relative; }
+/* Esquinas opuestas a las de Proyectos: al bajar por la pagina el tercer
+   color no se repite en el mismo sitio, se turna de lado. */
+.cifras::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(26rem circle at 6% 0%, rgba(214,212,201,.9), transparent 62%),
+    radial-gradient(26rem circle at 96% 100%, rgba(214,212,201,.8), transparent 64%);
+}
+.cifras .wrap { position: relative; }
 .cifras dl { display: grid; grid-template-columns: repeat(2, 1fr); }
 @media (min-width: 1024px) { .cifras dl { grid-template-columns: repeat(4, 1fr); } }
 .cifra { padding-block: 2.5rem; }
@@ -305,6 +321,20 @@ html { scroll-behavior: smooth; }
 .seccion { padding-block: 6rem; }
 @media (min-width: 768px) { .seccion { padding-block: 9rem; } }
 
+/* Dos manchas de luz muy tenues, del mismo calido que los bordes del
+   sitio (#D6D4C9), detras de la cabecera y de la grilla. El fondo llega
+   plano desde Cifras; esto le pone algo de variacion sin que se note como
+   "un elemento", solo como una zona un poco mas calida. Nada se anima ni
+   se anuncia: si hiciera falta mirarlo dos veces para notarlo, esta bien. */
+#proyectos { position: relative; }
+#proyectos::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(38rem circle at 88% 6%, rgba(214,212,201,.95), transparent 62%),
+    radial-gradient(30rem circle at 4% 78%, rgba(214,212,201,.9), transparent 64%);
+}
+#proyectos > .wrap { position: relative; }
+
 .cabecera { row-gap: 1.5rem; align-items: end; margin-bottom: 3.5rem; }
 @media (min-width: 768px) { .cabecera { margin-bottom: 5rem; } }
 .cabecera .c-titulo { grid-column: 1 / -1; }
@@ -324,17 +354,19 @@ html { scroll-behavior: smooth; }
 .filtro:hover { border-color: var(--ink); }
 .filtro[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
-.grilla { row-gap: 3.5rem; }
-@media (min-width: 768px) { .grilla { row-gap: 5rem; } }
+.grilla { row-gap: 2.5rem; column-gap: 1rem; }
+@media (min-width: 768px) { .grilla { row-gap: 3.25rem; } }
 .card { grid-column: 1 / -1; }
-/* Anchos y desfases desiguales: el ritmo editorial nace de la grilla, no del adorno */
+/* Anchos y desfases desiguales: el ritmo editorial nace de la grilla, no
+   del adorno. Los desfases se acortaron para que el conjunto lea mas
+   bento —bloques cercanos entre si— sin perder el escalonado. */
 @media (min-width: 768px) {
   .card.w7 { grid-column: span 7; }
   .card.w5 { grid-column: span 5; }
   .card.w6 { grid-column: span 6; }
-  .card.d24 { padding-top: 6rem; }
-  .card.d20 { padding-top: 5rem; }
-  .card.d16 { padding-top: 4rem; }
+  .card.d24 { padding-top: 2.5rem; }
+  .card.d20 { padding-top: 2rem; }
+  .card.d16 { padding-top: 1.5rem; }
 }
 .card.oculta { display: none; }
 
@@ -380,11 +412,115 @@ html { scroll-behavior: smooth; }
   margin-top: .5rem; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink);
   opacity: 0; transform: translateY(6px); transition: opacity var(--t-mid), transform var(--t-mid);
 }
-.card a:hover .leer, .card a:focus-visible .leer { opacity: 1; transform: none; }
+.card a:hover .leer, .card a:focus-visible .leer,
+.card button:hover .leer, .card button:focus-visible .leer { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .leer { opacity: 1; transform: none; transition: none; } }
 
 .vacio { display: none; padding-block: 5rem; text-align: center; }
 .vacio.visible { display: block; }
+
+/* ── Relato de proyecto ──────────────────────────────────────
+   Un carrusel que se ABRE ENCIMA de la pagina, no una toma que la
+   sustituye: el fondo del sitio queda visible, desenfocado, alrededor
+   del panel —de ahi el margen que deja .relato-contenido sin llegar al
+   borde—, y el propio panel lleva su vidrio (fondo translucido, borde
+   tenue) para leerse como una pieza flotando encima, no como una seccion
+   mas de la pagina. Fotos y videos van a tamaño de galeria, contenidos,
+   no a sangre: lo que manda es poder leer el texto junto a cada uno, no
+   la imagen ocupando la pantalla entera.
+   Los paneles se recorren en horizontal con el mismo motor de inercia
+   que ya se probo (rueda, arrastre, flechas — ver ProyectoModal.jsx). */
+.relato { position: fixed; inset: 0; z-index: 90; color: var(--paper); }
+
+.relato-fondo { position: absolute; inset: 0; z-index: 0; background: rgba(4,4,4,.6); backdrop-filter: blur(18px); }
+
+.relato-contenido {
+  position: absolute; z-index: 2;
+  inset: clamp(1rem, 5vw, 3rem);
+  display: flex; flex-direction: column;
+  background: rgba(14,14,14,.55); border: 1px solid rgba(255,255,255,.08);
+  overflow: hidden;
+}
+
+.relato-cabecera {
+  flex-shrink: 0; z-index: 3;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 1.75rem);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.relato-marca { display: flex; flex-direction: column; gap: .35rem; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
+.relato-marca-meta { color: rgba(255,255,255,.45); font-size: 11px; }
+
+.relato-cerrar {
+  flex-shrink: 0; display: grid; place-items: center; width: 40px; height: 40px;
+  background: rgba(255,255,255,.06); border: 0; color: var(--paper); cursor: pointer;
+  transition: background-color var(--t-fast);
+}
+.relato-cerrar:hover { background: rgba(255,255,255,.16); }
+
+/* La pista es un pliego horizontal, no una fila de diapositivas: cada
+   panel mide lo que pide su contenido, y de esa desigualdad —una foto
+   apaisada junto a una vertical, una con texto junto a una sin el— sale
+   el ritmo. El desplazamiento lo conduce JS con inercia; aqui solo se
+   esconde la barra y se centra todo verticalmente. */
+.relato-pista {
+  flex: 1; min-height: 0;
+  display: flex; align-items: center; gap: clamp(2rem, 5vw, 5rem);
+  padding: 0 clamp(1.5rem, 6vw, 5rem);
+  overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none; cursor: grab;
+}
+.relato-pista::-webkit-scrollbar { display: none; }
+.relato-pista.arrastrando { cursor: grabbing; }
+
+.relato-panel { flex: 0 0 auto; position: relative; height: 100%; display: flex; align-items: center; }
+.relato-capa { will-change: transform, opacity; display: flex; flex-direction: column; height: min(56svh, 32rem); gap: 1.25rem; }
+
+.relato-media-marco { flex: 1 1 auto; min-height: 0; }
+.relato-media-el { height: 100%; width: auto; max-width: min(64vw, 640px); object-fit: cover; display: block; }
+
+.relato-media-texto { flex-shrink: 0; max-width: 22rem; }
+.relato-media-texto h3 { font-size: 1.05rem; font-weight: 400; color: var(--paper); }
+.relato-media-texto p { margin-top: .5rem; font-size: .875rem; line-height: 1.6; color: rgba(255,255,255,.62); }
+
+.relato-panel--ficha .relato-capa { height: auto; max-width: min(46rem, 84vw); justify-content: center; }
+.relato-panel .eyebrow { color: var(--sand); }
+
+.relato-ficha { margin: 1.5rem 0 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem 2.5rem; }
+@media (min-width: 640px) { .relato-ficha { grid-template-columns: repeat(3, 1fr); } }
+.relato-ficha dt { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--sand); }
+.relato-ficha dd { margin: .5rem 0 0; font-size: 1rem; color: var(--paper); }
+
+/* Los mandos viven juntos abajo, dentro del propio panel: la barra dice
+   cuanto queda y las flechas estan donde ya esta mirando la mano. */
+.relato-pie {
+  flex-shrink: 0; z-index: 3;
+  display: flex; align-items: center; gap: 1rem;
+  padding: clamp(.75rem, 2vw, 1.25rem) clamp(1rem, 3vw, 1.75rem);
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.relato-flecha {
+  flex-shrink: 0; display: grid; place-items: center; width: 36px; height: 36px;
+  background: rgba(255,255,255,.06); border: 0; color: var(--paper); cursor: pointer;
+  transition: background-color var(--t-fast);
+}
+.relato-flecha:hover { background: rgba(255,255,255,.16); }
+.relato-flecha-icono { display: inline-block; transform: scaleX(-1); }
+
+.relato-barra { flex: 1; height: 1px; background: rgba(255,255,255,.18); overflow: hidden; }
+.relato-barra span { display: block; height: 100%; background: var(--paper); transform-origin: 0 50%; transform: scaleX(0); }
+
+@media (max-width: 640px) {
+  .relato-capa { height: min(42svh, 24rem); }
+  .relato-media-el { max-width: 84vw; }
+  .relato-media-texto { max-width: 84vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .relato-cerrar, .relato-flecha { transition: none; }
+  .relato-pista { cursor: default; }
+}
 
 /* ── Manifiesto (contrapunto oscuro, única sección anclada) ── */
 .manifiesto { background: var(--ink); color: var(--paper); }
@@ -438,7 +574,14 @@ html { scroll-behavior: smooth; }
 .mani-desde { color: var(--sand); }
 
 /* ── Estudio ─────────────────────────────────────────────── */
-.estudio { background: var(--paper); border-bottom: 1px solid var(--sand); }
+.estudio { background: var(--paper); border-bottom: 1px solid var(--sand); position: relative; }
+/* El blanco de esta seccion es el punto mas frio del sitio: la mancha
+   calida lo devuelve un poco hacia el tono del resto de la pagina. */
+.estudio::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(34rem circle at 94% 8%, rgba(214,212,201,.7), transparent 60%);
+}
+.estudio .wrap { position: relative; }
 .estudio .g12 { row-gap: 3rem; }
 .estudio .c-izq { grid-column: 1 / -1; }
 .estudio .c-der { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 1.5rem; }
@@ -555,8 +698,10 @@ form .btn { margin-top: 2rem; }
 
 /* El numero del proyecto acompana al cursor sobre la tarjeta */
 .pie-card .num { transition: transform var(--t-mid) var(--ease), color var(--t-mid); }
-.card a:hover .num, .card a:focus-visible .num { transform: translateY(-4px); color: var(--ink); }
+.card a:hover .num, .card a:focus-visible .num,
+.card button:hover .num, .card button:focus-visible .num { transform: translateY(-4px); color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .pie-card .num { transition: none; }
-  .card a:hover .num, .card a:focus-visible .num { transform: none; }
+  .card a:hover .num, .card a:focus-visible .num,
+  .card button:hover .num, .card button:focus-visible .num { transform: none; }
 }
