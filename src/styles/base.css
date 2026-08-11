@@ -187,7 +187,7 @@ html { scroll-behavior: smooth; }
 /* En movil la proporcion del bloque ya es la del video: cover no recorta
    casi nada. En escritorio cubre un cajon mucho mas alto que ancho que su
    propia proporcion, y ahi si hace falta subir el encuadre hacia la cara. */
-.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 32%; }
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
 
 /* Velo tibio del mismo tono que el fondo del sitio, apenas insinuado: solo
    lo necesario para que el texto oscuro no pierda el contraste con el que
@@ -200,7 +200,7 @@ html { scroll-behavior: smooth; }
 }
 @media (min-width: 768px) {
   .hero-velo {
-    background: linear-gradient(100deg, rgba(240,239,235,.55) 0%, rgba(240,239,235,.32) 42%, rgba(240,239,235,.08) 100%);
+    background: linear-gradient(100deg, rgba(240,239,235,.4) 0%, rgba(240,239,235,.22) 42%, rgba(240,239,235,.04) 100%);
   }
 }
 .hero .g12 { row-gap: 2.5rem; }
@@ -225,24 +225,6 @@ html { scroll-behavior: smooth; }
 @media (min-width: 768px)  { .hero .c-lead { grid-column: 1 / span 7; } }
 @media (min-width: 1024px) { .hero .c-lead { grid-column: 1 / span 5; } }
 .hero .c-cta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2rem; padding-top: .5rem; }
-
-/* Solo tiene sentido cuando el hero ocupa la pantalla entera: en movil,
-   corto y en flujo normal, la propia maqueta ya dice que hay mas debajo.
-   El velo del fondo se disuelve justo en esta esquina —ahi el video queda
-   mas al descubierto—, asi que el indicador lleva su propio respaldo en
-   vez de fiarse del degradado que lo protege en el resto del hero. */
-.indicador { display: none; }
-@media (min-width: 768px) {
-  .indicador {
-    display: flex; position: absolute; bottom: 2rem; right: var(--pad);
-    align-items: center; gap: .75rem;
-    padding: .5rem .9rem; border-radius: 999px;
-    background: rgba(240,239,235,.85); backdrop-filter: blur(6px);
-    font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--body);
-  }
-}
-.riel { display: block; position: relative; width: 40px; height: 1px; background: var(--sand); overflow: hidden; }
-.riel span { position: absolute; inset: 0; background: var(--ink); }
 
 /* ── Titulares partidos en letras ──────────────────────────
    La letra es la unidad de animación, pero NO la de lectura:
@@ -321,17 +303,19 @@ html { scroll-behavior: smooth; }
 .seccion { padding-block: 6rem; }
 @media (min-width: 768px) { .seccion { padding-block: 9rem; } }
 
-/* Dos manchas de luz muy tenues, del mismo calido que los bordes del
-   sitio (#D6D4C9), detras de la cabecera y de la grilla. El fondo llega
-   plano desde Cifras; esto le pone algo de variacion sin que se note como
-   "un elemento", solo como una zona un poco mas calida. Nada se anima ni
-   se anuncia: si hiciera falta mirarlo dos veces para notarlo, esta bien. */
+/* Manchas de luz calida, del mismo tono que los bordes del sitio
+   (#D6D4C9), detras de la cabecera y de la grilla. El fondo llega plano
+   desde Cifras; esto le pone variacion sin volverse "un elemento" que
+   compita con las tarjetas —solo zonas un poco mas calidas asomando
+   entre ellas. Nada se anima ni se anuncia. */
 #proyectos { position: relative; }
 #proyectos::before {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background:
-    radial-gradient(38rem circle at 88% 6%, rgba(214,212,201,.95), transparent 62%),
-    radial-gradient(30rem circle at 4% 78%, rgba(214,212,201,.9), transparent 64%);
+    radial-gradient(40rem circle at 88% 4%, rgba(216,209,190,1), transparent 60%),
+    radial-gradient(32rem circle at 3% 30%, rgba(216,209,190,.85), transparent 62%),
+    radial-gradient(34rem circle at 12% 96%, rgba(216,209,190,1), transparent 62%),
+    radial-gradient(26rem circle at 92% 62%, rgba(216,209,190,.8), transparent 65%);
 }
 #proyectos > .wrap { position: relative; }
 
@@ -473,17 +457,40 @@ html { scroll-behavior: smooth; }
 .relato-pista::-webkit-scrollbar { display: none; }
 .relato-pista.arrastrando { cursor: grabbing; }
 
-.relato-panel { flex: 0 0 auto; position: relative; height: 100%; display: flex; align-items: center; }
-.relato-capa { will-change: transform, opacity; display: flex; flex-direction: column; height: min(56svh, 32rem); gap: 1.25rem; }
+.relato-panel { flex: 0 0 auto; position: relative; height: 100%; display: flex; align-items: center; overflow: hidden; }
+.relato-capa { will-change: transform, opacity; display: flex; flex-direction: column; gap: 1.5rem; }
 
-.relato-media-marco { flex: 1 1 auto; min-height: 0; }
-.relato-media-el { height: 100%; width: auto; max-width: min(64vw, 640px); object-fit: cover; display: block; }
+/* Centrado solo para los paneles de medio: la ficha tecnica quiere su
+   texto estirado a lo ancho, no encogido y centrado como una foto. */
+.relato-panel--media .relato-capa { align-items: center; }
 
-.relato-media-texto { flex-shrink: 0; max-width: 22rem; }
+/* El medio es el foco: tiene su propia altura garantizada, no la que le
+   sobre tras acomodar el texto. Adentro se centra en los dos ejes —sin
+   esto un formato vertical, mas angosto que su marco, queda pegado al
+   borde izquierdo en vez de en medio, y eso es lo que hacia que se
+   viera chico y que un video se sintiera "encima" del panel vecino. */
+.relato-media-marco {
+  flex: 0 0 auto; height: min(58svh, 34rem);
+  display: flex; align-items: center; justify-content: center;
+}
+.relato-media-el { height: 100%; width: auto; max-width: min(72vw, 760px); object-fit: cover; display: block; }
+
+.relato-media-texto { flex-shrink: 0; max-width: 19rem; text-align: center; }
 .relato-media-texto h3 { font-size: 1.05rem; font-weight: 400; color: var(--paper); }
 .relato-media-texto p { margin-top: .5rem; font-size: .875rem; line-height: 1.6; color: rgba(255,255,255,.62); }
 
-.relato-panel--ficha .relato-capa { height: auto; max-width: min(46rem, 84vw); justify-content: center; }
+/* En pantallas con sitio de sobra, el texto se sienta A LA DERECHA del
+   medio, no debajo: la mirada se queda en una imagen a la vez con su
+   pie justo al lado, en vez de bajar a leer un subtitulo. Solo en
+   celular tiene sentido apilarlo, que es el layout de base de arriba. */
+@media (min-width: 641px) {
+  .relato-panel--con-texto .relato-capa { flex-direction: row; justify-content: center; gap: clamp(2rem, 4vw, 3.5rem); }
+  .relato-panel--con-texto .relato-media-marco { height: min(64svh, 40rem); }
+  .relato-panel--con-texto .relato-media-el { max-width: min(60vw, 760px); }
+  .relato-panel--con-texto .relato-media-texto { text-align: left; }
+}
+
+.relato-panel--ficha .relato-capa { max-width: min(46rem, 84vw); justify-content: center; }
 .relato-panel .eyebrow { color: var(--sand); }
 
 .relato-ficha { margin: 1.5rem 0 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem 2.5rem; }
@@ -511,10 +518,18 @@ html { scroll-behavior: smooth; }
 .relato-barra { flex: 1; height: 1px; background: rgba(255,255,255,.18); overflow: hidden; }
 .relato-barra span { display: block; height: 100%; background: var(--paper); transform-origin: 0 50%; transform: scaleX(0); }
 
+/* En celular la capa se apila (medio arriba, texto abajo) dentro de un
+   panel de altura fija: si la suma de ambos no cabe, algo se recorta sin
+   que haya forma de hacer scroll para verlo —de ahi que aqui el medio y
+   el texto bajen de tamaño juntos, para que el pie de foto mas largo
+   siempre termine de leerse dentro de la pantalla. */
 @media (max-width: 640px) {
-  .relato-capa { height: min(42svh, 24rem); }
+  .relato-capa { gap: 1rem; }
+  .relato-media-marco { height: min(32svh, 17rem); }
   .relato-media-el { max-width: 84vw; }
   .relato-media-texto { max-width: 84vw; }
+  .relato-media-texto h3 { font-size: .9rem; }
+  .relato-media-texto p { margin-top: .35rem; font-size: .8125rem; line-height: 1.5; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -6,11 +6,8 @@ import fotoSilo from '../assets/fotos/silo.jpg'
 import fotoBibliotecaRio from '../assets/fotos/biblioteca-rio.jpg'
 import fotoMarina from '../assets/fotos/marina-olivares.jpg'
 
-// PROVISIONAL: el unico clip que hay en el repo es el del hero. Esta aqui
-// para que el bloque de video del relato se pueda ver funcionando; en
-// cuanto haya metraje de obra real, se cambian estas dos rutas y ya.
-import clipProvisional from '../assets/video/marina-hero.mp4'
-import posterProvisional from '../assets/fotos/marina-hero-poster.jpg'
+import clipObraCasaLadera from '../assets/video/casa-ladera-obra.mp4'
+import posterObraCasaLadera from '../assets/fotos/casa-ladera-obra-poster.jpg'
 
 /**
  * Los seis proyectos de la portada.
@@ -64,7 +61,7 @@ export const proyectos = [
         texto: 'La ladera manda: la casa se parte en volúmenes bajos que siguen la pendiente en vez de nivelarla. Piedra local en los muros que miran al camino, madera y vidrio en los que se abren al valle.',
       },
       {
-        tipo: 'video', src: clipProvisional, poster: posterProvisional,
+        tipo: 'video', src: clipObraCasaLadera, poster: posterObraCasaLadera,
         titulo: 'Visita de obra',
         texto: 'Invierno de 2024, antes del cierre de la envolvente.',
       },

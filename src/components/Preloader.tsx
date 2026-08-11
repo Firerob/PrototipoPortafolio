@@ -15,10 +15,10 @@ import { sinMovimientoAhora, useSinMovimiento } from '../hooks/useMovimiento.js'
  *
  * Sobre la duracion: casi cuatro segundos bloqueando el scroll es mucho
  * para quien ya conoce el sitio, y las guias de UX son explicitas en que
- * una secuencia de apertura no debe ser obligatoria. De ahi las tres
- * salidas que trae: tecla Escape, boton visible, y `soloUnaVezPorSesion`
- * para que en produccion no se repita en cada navegacion. Con
- * `prefers-reduced-motion` no llega a montarse.
+ * una secuencia de apertura no debe ser obligatoria. De ahi las salidas
+ * que trae: tecla Escape y `soloUnaVezPorSesion` para que en produccion
+ * no se repita en cada navegacion. Con `prefers-reduced-motion` no llega
+ * a montarse.
  *
  * Se desmonta solo: mantiene su propio AnimatePresence, de modo que la
  * animacion de salida termina antes de desaparecer sin que el componente
@@ -52,8 +52,6 @@ export interface PreloaderProps {
   soloUnaVezPorSesion?: boolean
   /** Clave de sessionStorage cuando la opcion anterior esta activa. */
   claveSesion?: string
-  /** Texto del boton de salida. */
-  textoSaltar?: string
 }
 
 type Fase = 'palabras' | 'nombre' | 'saliendo'
@@ -71,7 +69,6 @@ export default function Preloader({
   soloNombre = false,
   soloUnaVezPorSesion = false,
   claveSesion = 'apertura-vista',
-  textoSaltar = 'Saltar',
 }: PreloaderProps) {
   const sinMovimiento = useSinMovimiento()
 
@@ -178,19 +175,6 @@ export default function Preloader({
           <p className="sr-only" role="status" aria-live="polite">
             Cargando el sitio
           </p>
-
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={salir}
-              className="min-h-[44px] cursor-pointer px-4 text-[11px] uppercase
-                         tracking-[0.22em] text-white/60 transition-colors
-                         hover:text-white focus-visible:outline focus-visible:outline-2
-                         focus-visible:outline-offset-4 focus-visible:outline-white"
-            >
-              {textoSaltar}
-            </button>
-          </div>
 
           <div className="flex flex-1 items-center">
             {/* ── Fase 1: palabras que se relevan ── */}

@@ -57,7 +57,6 @@ export default function Hero({ arrancar }) {
   // texto ya se dejo atras, para que el paso a la marquesina no sea un corte.
   const opacidadHero = useTransform(scrollYProgress, [0, 0.55, 0.95], [1, 1, 0])
   const yHero = useTransform(scrollYProgress, [0, 1], [0, -60])
-  const anchoRiel = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
 
   // La carga arranca desde el primer instante, aunque el video no se vea:
   // la intro tarda bastante mas de dos segundos, tiempo de sobra para que
@@ -141,13 +140,6 @@ export default function Hero({ arrancar }) {
           </motion.div>
         </div>
       </motion.div>
-
-      <div className="indicador" aria-hidden="true">
-        Scroll
-        <span className="riel">
-          <motion.span style={{ width: anchoRiel, left: 0, right: 'auto' }} />
-        </span>
-      </div>
     </section>
   )
 }

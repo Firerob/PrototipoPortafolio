@@ -22,10 +22,13 @@ const PARALAJE = 40
  * "flota sobre la web" en vez de "sustituye a la web"—, y las fotos y
  * videos se ven a un tamaño de galeria, contenido, no a sangre.
  *
- * La entrada es deliberadamente simple: un fundido con leve escala. Ya
- * hubo una version con zoom desde la tarjeta clicada, y sobraba —
- * competia por la atencion con el propio contenido del carrusel, que es
- * lo que de verdad importa aqui.
+ * La entrada no es un simple fundido: el panel crece desde un punto
+ * pequeño y desenfocado hasta su tamaño real, como un tiro de camara
+ * que hace foco. El fondo (velo + backdrop-filter) se desvanece aparte
+ * y mas rapido, para que no compita con ese gesto — es un telon, no
+ * el protagonista. Ya hubo una version con zoom desde la tarjeta
+ * clicada, y sobraba: competia por la atencion con el propio contenido
+ * del carrusel, que es lo que de verdad importa aqui.
  *
  * El recorrido horizontal usa el mismo motor de inercia que ya se probo
  * y funciono: la rueda y el arrastre mueven una posicion deseada, y un
@@ -215,19 +218,38 @@ export default function ProyectoModal({ proyecto, onClose, disparador }) {
       aria-modal="true"
       aria-label={`${proyecto.titulo}, detalle del proyecto`}
       onClick={(e) => { if (e.target === e.currentTarget) cerrar() }}
-      initial={{ opacity: 0 }}
+      initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: sinMovimiento ? 0 : 0.3, ease: [0.16, 1, 0.3, 1] }}
+      exit={{ opacity: 1 }}
+      transition={{ duration: sinMovimiento ? 0 : 0.4 }}
     >
-      <div className="relato-fondo" aria-hidden="true" />
+      {/* El velo se desvanece por su cuenta, mas rapido que el panel:
+          es el fondo de la escena, no el gesto principal. */}
+      <motion.div
+        className="relato-fondo"
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: { duration: sinMovimiento ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] } }}
+        exit={{ opacity: 0, transition: { duration: sinMovimiento ? 0 : 0.2, ease: [0.4, 0, 1, 1] } }}
+      />
 
       <motion.div
         className="relato-contenido"
-        initial={sinMovimiento ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 14 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={sinMovimiento ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 10 }}
-        transition={{ duration: sinMovimiento ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
+        style={{ willChange: 'transform, filter, opacity' }}
+        initial={sinMovimiento ? { opacity: 0 } : { opacity: 0, scale: 0.15, filter: 'blur(14px)' }}
+        animate={
+          sinMovimiento
+            ? { opacity: 1, transition: { duration: 0 } }
+            // Arranca despacio y gana velocidad hacia el final —el foco
+            // que tarda en llegar y luego encaja de golpe—, en vez de la
+            // desaceleracion pareja de antes.
+            : { opacity: 1, scale: 1, filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.42, 0, 1, 1] } }
+        }
+        exit={
+          sinMovimiento
+            ? { opacity: 0, transition: { duration: 0 } }
+            : { opacity: 0, scale: 0.15, filter: 'blur(14px)', transition: { duration: 0.4, ease: [0.4, 0, 1, 1] } }
+        }
       >
         <div className="relato-cabecera">
           <p className="relato-marca">
