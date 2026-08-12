@@ -27,6 +27,9 @@ const EDGES = [
   'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
   'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
   'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+  '/usr/bin/google-chrome',
+  '/usr/bin/chromium-browser',
+  '/usr/bin/chromium',
 ]
 
 const TIPOS = {
@@ -267,6 +270,20 @@ async function main() {
     const t2 = await leerTira()
     anota('La marquesina se desplaza sola', t1 !== t2, `${t1.slice(0, 28)} → ${t2.slice(0, 28)}`)
 
+    // ── Cinta de testimonios (mismo motor que la marquesina) ────
+    const leerCinta = () => page.$eval('.cinta-pista', (n) => getComputedStyle(n).transform)
+    const c1 = await leerCinta()
+    await pausa(600)
+    const c2 = await leerCinta()
+    anota('La cinta de testimonios se desplaza sola', c1 !== c2, `${c1.slice(0, 28)} → ${c2.slice(0, 28)}`)
+
+    await page.hover('.cinta-card')
+    const c3 = await leerCinta()
+    await pausa(600)
+    const c4 = await leerCinta()
+    anota('La cinta se pausa con el mouse encima', c3 === c4, `${c3.slice(0, 28)} = ${c4.slice(0, 28)}`)
+    await page.mouse.move(5, 5)
+
     // ── Cifras ─────────────────────────────────────────────────
     await page.evaluate(() => document.querySelector('.cifras').scrollIntoView())
     await pausa(2200)
@@ -413,18 +430,19 @@ async function main() {
       (await scrollY()) < ySeguido - 100 && (await leerEscala()) < 1.05,
       `scrollY ${ySeguido} → ${await scrollY()}, escala=${(await leerEscala()).toFixed(2)}x`)
 
-    // El retrato del estudio usa la misma pieza
-    await page.evaluate(() => document.querySelector('#estudio').scrollIntoView())
+    // El retrato de Perfil ya no lleva zoom por rueda —esa rueda conduce
+    // la linea de tiempo anclada—, asi que aqui solo se comprueba que la
+    // foto exista y cargue dentro del contenedor pegajoso.
+    await page.evaluate(() => document.querySelector('#perfil').scrollIntoView())
     await pausa(1600)
-    const cajaRetrato = await (await page.$('.retrato .marco')).boundingBox()
-    await page.mouse.move(cajaRetrato.x + cajaRetrato.width / 2, cajaRetrato.y + cajaRetrato.height / 2)
-    await pausa(450)
-    for (let i = 0; i < 3; i++) { await page.mouse.wheel({ deltaY: -100 }); await pausa(120) }
-    await pausa(700)
-    const retratoEscala = await page.$eval('.retrato .shot',
-      (n) => new DOMMatrix(getComputedStyle(n).transform).a)
-    anota('El retrato del estudio también hace zoom', retratoEscala > 1.4,
-      `escala=${retratoEscala.toFixed(2)}x`)
+    const retratoPerfil = await page.evaluate(() => {
+      const img = document.querySelector('.perfil-retrato img.shot')
+      const dentro = !!img?.closest('.perfil-pegado')
+      return { existe: !!img, cargo: !!img?.complete && img?.naturalWidth > 0, dentro }
+    })
+    anota('El retrato de Perfil existe, carga y vive dentro del anclaje',
+      retratoPerfil.existe && retratoPerfil.cargo && retratoPerfil.dentro,
+      JSON.stringify(retratoPerfil))
 
     await page.evaluate(() => window.scrollTo(0, 0))
     await pausa(600)
@@ -445,16 +463,16 @@ async function main() {
     await page.$$eval('.filtro', (ns) => ns.find((n) => n.textContent === 'Todos').click())
     await pausa(800)
 
-    // ── Manifiesto ─────────────────────────────────────────────
+    // ── Perfil ─────────────────────────────────────────────────
     // Esta comprobacion miraba `getComputedStyle().position === 'sticky'`,
     // que es la propiedad, no el comportamiento. Y pasaba estando roto:
-    // `.manifiesto` tenia `overflow: hidden`, que lo convertia en contenedor
+    // `.perfil` tenia `overflow: hidden`, que lo convertia en contenedor
     // de scroll, y el hijo se anclaba respecto a el —que no scrollea— en vez
     // de respecto a la ventana. El texto se iba a los 500 px y detras
     // quedaban 1400 px de negro. Ahora se mide lo unico que importa: que al
     // avanzar por la seccion el contenedor NO se mueva de la pantalla.
-    const recorridoManifiesto = await page.evaluate(async () => {
-      const s = document.getElementById('manifiesto')
+    const recorridoPerfil = await page.evaluate(async () => {
+      const s = document.getElementById('perfil')
       const previo = document.documentElement.style.scrollBehavior
       document.documentElement.style.scrollBehavior = 'auto'
       // El anclaje dura lo que sobra de seccion por encima de la ventana;
@@ -467,52 +485,55 @@ async function main() {
         const d = Math.round(recorrido * f)
         window.scrollTo(0, s.offsetTop + d)
         await new Promise((r) => setTimeout(r, 250))
-        const pegado = document.querySelector('.mani-pegado').getBoundingClientRect()
-        const cita = document.querySelector('.mani').getBoundingClientRect()
+        const pegado = document.querySelector('.perfil-pegado').getBoundingClientRect()
+        const foto = document.querySelector('.perfil-retrato').getBoundingClientRect()
         tomas.push({
           d,
           top: Math.round(pegado.top),
-          visible: cita.bottom > 0 && cita.top < window.innerHeight,
+          visible: foto.bottom > 0 && foto.top < window.innerHeight,
         })
       }
       document.documentElement.style.scrollBehavior = previo
       return tomas
     })
-    anota('El manifiesto se queda anclado mientras se recorre',
-      recorridoManifiesto.every((t) => Math.abs(t.top) <= 2),
-      recorridoManifiesto.map((t) => `+${t.d}→y${t.top}`).join(' '))
-    anota('La cita nunca se va de la pantalla dentro de su sección',
-      recorridoManifiesto.every((t) => t.visible),
-      `${recorridoManifiesto.filter((t) => t.visible).length}/4 posiciones`)
+    anota('Perfil se queda anclado mientras se recorre',
+      recorridoPerfil.every((t) => Math.abs(t.top) <= 2),
+      recorridoPerfil.map((t) => `+${t.d}→y${t.top}`).join(' '))
+    anota('El retrato nunca se va de la pantalla dentro de su sección',
+      recorridoPerfil.every((t) => t.visible),
+      `${recorridoPerfil.filter((t) => t.visible).length}/4 posiciones`)
 
-    // La composicion editorial: rotulo arriba, cita en medio, pie abajo.
-    // Antes el texto flotaba solo y ocupaba el 29% del alto de la caja.
+    // La composicion editorial: rotulo arriba, cuerpo en medio, pie abajo.
+    // Antes (Manifiesto) el texto flotaba solo y ocupaba el 29% del alto
+    // de la caja; ahora el cuerpo es una linea de tiempo mas un retrato.
     const composicion = await page.evaluate(() => {
-      const caja = document.querySelector('.manifiesto .caja').getBoundingClientRect()
-      const rot = document.querySelector('.mani-rotulo').getBoundingClientRect()
-      const pie = document.querySelector('.mani-pie').getBoundingClientRect()
+      const caja = document.querySelector('.perfil .caja').getBoundingClientRect()
+      const rot = document.querySelector('.perfil-rotulo').getBoundingClientRect()
+      const pie = document.querySelector('.perfil-pie').getBoundingClientRect()
       return {
         ocupacion: Math.round(((pie.bottom - rot.top) / caja.height) * 100),
-        cita: !!document.querySelector('.manifiesto blockquote cite, .manifiesto cite'),
+        atribucion: !!document.querySelector('.perfil-cartel cite'),
       }
     })
     anota('La sección está compuesta, no es un párrafo flotando',
-      composicion.ocupacion > 60 && composicion.cita,
+      composicion.ocupacion > 60 && composicion.atribucion,
       `el contenido ocupa el ${composicion.ocupacion}% del alto (antes 29%)`)
 
-    const leerColor = () => page.$eval('.mani span:nth-child(3)', (n) => getComputedStyle(n).color)
+    // Los hitos que aun no llegan a su tramo del scroll quedan en un gris
+    // apagado; el ultimo se enciende a blanco cerca del final del anclaje.
+    const leerColor = () => page.$eval('.hito:last-child p', (n) => getComputedStyle(n).color)
     await page.evaluate(() => {
-      const m = document.getElementById('manifiesto')
-      window.scrollTo(0, m.offsetTop)
+      const p = document.getElementById('perfil')
+      window.scrollTo(0, p.offsetTop)
     })
     await pausa(700)
     const colorInicio = await leerColor()
     await page.evaluate(() => {
-      const m = document.getElementById('manifiesto')
-      window.scrollTo(0, m.offsetTop + window.innerHeight * 0.9)
+      const p = document.getElementById('perfil')
+      window.scrollTo(0, p.offsetTop + (p.getBoundingClientRect().height - window.innerHeight) * 0.9)
     })
     await pausa(700)
-    anota('Las palabras del manifiesto se encienden con el scroll',
+    anota('Los hitos de la trayectoria se encienden con el scroll',
       colorInicio !== (await leerColor()), `${colorInicio} → ${await leerColor()}`)
 
     // ── Formulario ─────────────────────────────────────────────
@@ -536,7 +557,7 @@ async function main() {
     await page.$eval('form.c-form', (f) => f.requestSubmit())
     await pausa(400)
     anota('El formulario válido confirma el envío',
-      await page.$eval('#form-estado', (n) => n.textContent.includes('Gracias')),
+      await page.$eval('#form-estado', (n) => n.textContent.includes('Recibido')),
       await page.$eval('#form-estado', (n) => `"${n.textContent}"`))
 
     // ── Navegación ─────────────────────────────────────────────
@@ -575,10 +596,10 @@ async function main() {
       `escalaX ${progresoArriba.toFixed(2)} → ${progresoAbajo.toFixed(2)}`)
 
     // La sección activa se marca sola
-    await page.evaluate(() => document.getElementById('proceso').scrollIntoView())
+    await page.evaluate(() => document.getElementById('servicios').scrollIntoView({ block: 'center' }))
     await pausa(1200)
     anota('La navegación marca la sección en la que estás',
-      await page.$eval('.nav-links a[aria-current]', (n) => n.getAttribute('aria-label') === 'Proceso'),
+      await page.$eval('.nav-links a[aria-current]', (n) => n.getAttribute('aria-label') === 'Servicios'),
       await page.$$eval('.nav-links a[aria-current]',
         (ns) => ns.map((n) => n.getAttribute('aria-label')).join(',') || 'ninguna'))
 

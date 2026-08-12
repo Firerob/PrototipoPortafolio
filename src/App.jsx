@@ -8,9 +8,9 @@ import Hero from './components/Hero.jsx'
 import Marquesina from './components/Marquesina.jsx'
 import Cifras from './components/Cifras.jsx'
 import Proyectos from './components/Proyectos.jsx'
-import Manifiesto from './components/Manifiesto.jsx'
-import Estudio from './components/Estudio.jsx'
-import Proceso from './components/Proceso.jsx'
+import Perfil from './components/Perfil.jsx'
+import Servicios from './components/Servicios.jsx'
+import Testimonios from './components/Testimonios.jsx'
 import Contacto from './components/Contacto.jsx'
 import { useSinMovimiento } from './hooks/useMovimiento.js'
 
@@ -52,19 +52,21 @@ export default function App() {
         <Marquesina />
         <Cifras />
         <Proyectos />
-        <Manifiesto />
-        <Estudio />
-        <Proceso />
+        <Perfil />
+        <Servicios />
+        <Testimonios />
         <Contacto />
       </main>
 
       <footer className="pie oscuro">
         <div className="wrap pie-fila">
-          <p>© 2026 Marina Olivares Arquitectura</p>
+          <p>© {new Date().getFullYear()} Marina Olivares · Arquitecta</p>
           <ul>
-            <li><a href="#" className="sub">Instagram</a></li>
-            <li><a href="#" className="sub">LinkedIn</a></li>
-            <li><a href="#" className="sub">Aviso legal</a></li>
+            <li><a href="mailto:hola@marinaolivares.cl" className="sub">hola@marinaolivares.cl</a></li>
+            <li><a href="https://instagram.com/marinaolivares.arq" className="sub"
+                   target="_blank" rel="noopener noreferrer">Instagram</a></li>
+            <li><a href="https://www.linkedin.com/in/marinaolivares" className="sub"
+                   target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
           </ul>
         </div>
       </footer>

@@ -134,7 +134,8 @@ export default function Proyectos() {
             <TituloPartido texto="Proyectos seleccionados" className="h2" />
           </div>
           <Revelar as="p" className="small c-nota">
-            Una selección de obra construida entre 2021 y 2025.
+            Seis obras entre 2021 y 2025, 6.260 m² en total. La última se
+            recibe este año.
           </Revelar>
         </div>
 
@@ -168,6 +169,15 @@ export default function Proyectos() {
         {visibles.length === 0 && (
           <p className="vacio visible">No hay proyectos en esta categoría todavía.</p>
         )}
+
+        <Revelar className="puente">
+          <p className="small">
+            Aquí hay seis de sesenta y cuatro obras entregadas. Si busca una
+            tipología que no aparece, pídame la ficha: superficie, plazo y
+            costo por m².
+          </p>
+          <a href="#contacto" className="enlace-simple sub">Pedir una ficha</a>
+        </Revelar>
       </div>
 
       <AnimatePresence>

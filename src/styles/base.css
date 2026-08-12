@@ -106,6 +106,16 @@ html { scroll-behavior: smooth; }
 .nav-fila { display: flex; align-items: center; justify-content: space-between; height: 5rem; }
 @media (min-width: 768px) { .nav-fila { height: 6rem; } }
 
+/* El nav es fijo y tapa lo que haya justo debajo del borde de la ventana.
+   Sin este margen, saltar a un ancla (el menu movil, el nav de escritorio,
+   la marca a #inicio) deja el eyebrow y el titulo de la seccion escondidos
+   detras del header en vez de a la vista. El valor calca el alto de
+   `.nav-fila` en cada ancho. */
+#inicio, #proyectos, #perfil, #servicios, #contacto { scroll-margin-top: 5rem; }
+@media (min-width: 768px) {
+  #inicio, #proyectos, #perfil, #servicios, #contacto { scroll-margin-top: 6rem; }
+}
+
 .marca { font-size: .875rem; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); }
 .nav-links { display: none; }
 @media (min-width: 768px) {
@@ -226,7 +236,7 @@ html { scroll-behavior: smooth; }
 @media (min-width: 1024px) {
   /* En pantallas grandes el video de fondo gana presencia y el parrafo,
      con su tamaño de siempre, queda chico a su lado. Solo aqui se le da
-     mas cuerpo; el resto de usos de .lead (Estudio) no se toca. */
+     mas cuerpo; el resto de usos de .lead (Contacto) no se toca. */
   .hero .c-lead { grid-column: 1 / span 5; font-size: clamp(1.15rem, 1.5vw, 1.375rem); }
 }
 .hero .c-cta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 2rem; padding-top: .5rem; }
@@ -253,7 +263,7 @@ html { scroll-behavior: smooth; }
 }
 .marco { transform-style: preserve-3d; }
 
-/* Foco de luz que sigue al cursor sobre el manifiesto */
+/* Foco de luz que sigue al cursor sobre Perfil */
 #foco {
   position: absolute; inset: 0; pointer-events: none; opacity: 0;
   background: radial-gradient(340px circle at var(--fx, 50%) var(--fy, 50%), rgba(255,255,255,.09), transparent 70%);
@@ -266,7 +276,7 @@ html { scroll-behavior: smooth; }
    activarse nunca: el texto se iba a los 500 px y detras quedaban 1400 px
    de negro. El recorte que hacia falta ya lo hace el propio contenedor
    pegajoso, que lleva su overflow hidden. */
-.manifiesto { position: relative; }
+.perfil { position: relative; }
 @media (prefers-reduced-motion: reduce) { #foco { display: none; } }
 
 /* ── Marquesina ──────────────────────────────────────────── │
@@ -441,7 +451,7 @@ html { scroll-behavior: smooth; }
 .relato-marca-meta { color: rgba(255,255,255,.45); font-size: 11px; }
 
 .relato-cerrar {
-  flex-shrink: 0; display: grid; place-items: center; width: 40px; height: 40px;
+  flex-shrink: 0; display: grid; place-items: center; width: 44px; height: 44px;
   background: rgba(255,255,255,.06); border: 0; color: var(--paper); cursor: pointer;
   transition: background-color var(--t-fast);
 }
@@ -513,7 +523,7 @@ html { scroll-behavior: smooth; }
 }
 
 .relato-flecha {
-  flex-shrink: 0; display: grid; place-items: center; width: 36px; height: 36px;
+  flex-shrink: 0; display: grid; place-items: center; width: 44px; height: 44px;
   background: rgba(255,255,255,.06); border: 0; color: var(--paper); cursor: pointer;
   transition: background-color var(--t-fast);
 }
@@ -548,89 +558,143 @@ html { scroll-behavior: smooth; }
   .relato-pista { cursor: default; }
 }
 
-/* ── Manifiesto (contrapunto oscuro, única sección anclada) ── */
-.manifiesto { background: var(--ink); color: var(--paper); }
-.mani-pegado { position: sticky; top: 0; overflow: hidden; }
+/* ── Perfil (contrapunto oscuro, única sección anclada) ─────
+   Fue el Manifiesto: se queda con el fondo, el anclaje y el foco de luz,
+   pero ya no enciende una frase palabra a palabra, enciende una linea de
+   tiempo. Cuando la ventana no da para anclar (telefono, o `.perfil-pegado`
+   forzado a `position:static` desde el componente), estas mismas reglas
+   sirven de base y el componente aporta el resto en linea. */
+.perfil { background: var(--ink); color: var(--paper); }
+.perfil-pegado { position: sticky; top: 0; overflow: hidden; }
 
-/* Tres alturas, no una. `1fr` en el centro empuja rotulo y pie contra los
-   extremos, asi que la cita cae en el centro optico y el vacio queda
-   repartido como margen en vez de amontonado arriba y abajo. */
-/* El padding superior descuenta la navegacion fija (5rem, 6rem desde 768).
-   Al estar la seccion pegada al top de la ventana, sin ese descuento el
-   rotulo nace justo debajo de la barra y se lee como si la tocara. */
-.manifiesto .caja {
+.perfil .caja {
   min-height: 100svh; padding-block: 7rem 5rem;
   display: grid; grid-template-rows: auto 1fr auto; gap: 3rem;
 }
-@media (min-width: 768px) { .manifiesto .caja { padding-block: 9rem 6rem; gap: 4rem; } }
+@media (min-width: 768px) { .perfil .caja { padding-block: 9rem 6rem; gap: 4rem; } }
+@media (max-height: 820px) { .perfil .caja { padding-block: 6rem 3.5rem; gap: 2rem; } }
 
-/* Rotulo: la seccion era la unica del sitio sin uno. La regla lo remata
-   y ocupa el ancho sobrante, que es lo que hace que la linea superior lea
-   como cabecera de pagina y no como una palabra suelta. */
-.mani-rotulo { display: flex; align-items: center; gap: 1.5rem; }
-.mani-rotulo .eyebrow { color: var(--sand); flex-shrink: 0; }
-.mani-regla { display: block; height: 1px; background: rgba(214,213,210,.35); }
+.perfil-rotulo { display: flex; align-items: center; gap: 1.5rem; }
+.perfil-rotulo .eyebrow { color: var(--sand); flex-shrink: 0; }
+.perfil-regla { display: block; height: 1px; background: rgba(214,213,210,.35); }
 
-/* La cita manda: sube de 3.25 a 4rem y se queda en 18 palabras por linea
-   como maximo, que es donde el ojo todavia vuelve solo al margen. */
-.mani {
-  margin: 0; align-self: center;
-  font-weight: 200; letter-spacing: -.015em;
-  font-size: clamp(1.6rem, 4.6vw, 4rem); line-height: 1.2;
-  max-width: 20ch; text-wrap: balance;
+.perfil-cuerpo { align-content: center; row-gap: 3rem; }
+.perfil-relato { grid-column: 1 / -1; }
+.perfil-retrato { grid-column: 1 / -1; position: relative; }
+/* En movil el orden del documento (relato primero, retrato despues) deja
+   seis hitos de curriculum sobre fondo negro antes de mostrar una cara.
+   `order` los intercambia solo visualmente: el retrato entra primero, como
+   una pausa, y con un ancho propio en vez de estirarse a lo ancho del
+   telefono —sin esto una foto 3:4 a todo el ancho da ~450px de alto sin
+   que nadie lo haya decidido. */
+@media (max-width: 767px) {
+  .perfil-retrato { order: -1; max-width: 18rem; margin-inline: auto; }
 }
-@media (min-width: 768px) { .mani { max-width: 24ch; } }
-@media (min-width: 1280px) { .mani { max-width: 26ch; } }
-.mani p { margin: 0; }
-/* Las palabras aun sin encender: 6.6:1 sobre el fondo. No es un estado
-   "apagado" que haya que descifrar —se lee perfectamente desde el
-   principio—, solo un contraste menor que el de las ya encendidas. */
-.mani span { color: #8C8C89; }
+@media (min-width: 768px) {
+  .perfil-relato { grid-column: 1 / span 6; }
+  /* Ancho contenido: a pantalla completa una cara del tamaño de un
+     proyecto desequilibraría la jerarquía —la obra manda, la autora
+     acompaña—, el mismo criterio que ya regia el retrato de Estudio. */
+  .perfil-retrato { grid-column: 8 / -1; max-width: 20rem; margin-left: auto; }
+}
+.perfil .h2 { color: var(--paper); font-size: clamp(1.75rem, 3.4vw, 2.75rem); }
 
-/* Pie: cierra la composicion contra el borde inferior. En pantalla ancha
-   la atribucion se va a la derecha, debajo del final de la cita, que es
-   donde la busca el ojo al terminar de leer. */
-.mani-pie {
+.perfil-cartel {
+  position: absolute; inset-inline: 0; bottom: 0; padding: 1.25rem;
+  background: linear-gradient(0deg, rgba(17,17,17,.86) 0%, rgba(17,17,17,0) 100%);
+}
+.perfil-cartel p { margin: 0; color: var(--paper); font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.3; font-weight: 300; }
+.perfil-cartel cite {
+  display: block; margin-top: .5rem; font-style: normal;
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--sand);
+}
+
+/* La linea de tiempo: un eje que se dibuja con el scroll (`scaleY`, el
+   mismo truco que ya usaba la regla del rotulo) y, sobre el, los hitos.
+   Los que aun no llegan a su tramo NO bajan a opacidad 0 —6.6:1 sobre
+   --ink, igual que las palabras sin encender de antes— para que quien
+   entra directo a #perfil por link no vea filas en blanco. */
+.hitos-envoltorio { position: relative; margin-top: 2.5rem; }
+.perfil-eje { position: absolute; left: 3px; top: .5rem; bottom: .5rem; width: 1px; background: rgba(214,213,210,.35); transform-origin: top; }
+.hitos { display: grid; row-gap: 1.75rem; padding-left: 1.75rem; }
+.hito { position: relative; }
+.hito-punto { position: absolute; left: -1.75rem; top: .45rem; width: 7px; height: 7px; border-radius: 50%; background: var(--sand); }
+.hito-cabeza { display: flex; align-items: baseline; gap: 1rem; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
+.hito-cabeza h3 { font-size: inherit; letter-spacing: inherit; text-transform: inherit; font-weight: 400; color: inherit; }
+.hito p { margin: .4rem 0 0; font-size: .8125rem; line-height: 1.5; max-width: 46ch; color: #8C8C89; }
+@media (max-height: 820px) { .hito p { font-size: .75rem; } }
+
+.perfil-pie {
   display: flex; flex-wrap: wrap; align-items: baseline;
   justify-content: space-between; gap: .5rem 2rem;
   padding-top: 1.5rem; border-top: 1px solid rgba(214,213,210,.18);
-  font-size: 12px; letter-spacing: .22em; text-transform: uppercase;
 }
-.mani-pie cite { font-style: normal; color: var(--paper); }
-.mani-desde { color: var(--sand); }
+.perfil-pie p { margin: 0; color: var(--sand); max-width: 52ch; }
+.perfil-pie a { color: var(--paper); }
 
-/* ── Estudio ─────────────────────────────────────────────── */
-.estudio { background: var(--paper); border-bottom: 1px solid var(--sand); position: relative; }
-/* El blanco de esta seccion es el punto mas frio del sitio: la mancha
-   calida lo devuelve un poco hacia el tono del resto de la pagina. */
-.estudio::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(34rem circle at 94% 8%, rgba(214,212,201,.7), transparent 60%);
+/* ── Servicios: tabla de encargos ────────────────────────────
+   Fila completa numerada, no tarjeta en rejilla de a tres: el ritmo es
+   horizontal y el titulo del servicio es lo que pesa, no la nota. La
+   regla-que-se-dibuja-sola que tenia Proceso se rescata aqui en vez de
+   perderse con esa seccion. */
+.encargos { margin-top: 1rem; }
+.encargo { position: relative; display: grid; grid-template-columns: 1fr; row-gap: .5rem; padding: 2rem 0 2.25rem; }
+@media (min-width: 768px) { .encargo { grid-template-columns: 3fr 5fr 4fr; column-gap: var(--gap); align-items: start; } }
+.encargo-regla { position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: var(--sand); transform-origin: left; }
+.encargo:last-child::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: var(--sand); }
+.encargo-fondo { position: absolute; inset: 0 -1rem; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform .55s var(--ease); z-index: -1; }
+.encargo > *:not(.encargo-fondo):not(.encargo-regla) { position: relative; }
+.encargo-n { display: flex; flex-direction: column; gap: .5rem; }
+.encargo-n span { font-variant-numeric: tabular-nums; font-size: 13px; letter-spacing: .22em; color: var(--mute); }
+.encargo h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 200; letter-spacing: -.02em; color: var(--ink); }
+.encargo-texto { max-width: 46ch; }
+@media (hover: hover) {
+  .encargo:hover .encargo-fondo, .encargo:focus-within .encargo-fondo { transform: scaleX(1); }
+  .encargo:hover h3, .encargo:hover .encargo-texto,
+  .encargo:hover .encargo-n span, .encargo:hover .encargo-alcance { color: var(--paper); }
 }
-.estudio .wrap { position: relative; }
-.estudio .g12 { row-gap: 3rem; }
-.estudio .c-izq { grid-column: 1 / -1; }
-.estudio .c-der { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 1.5rem; }
-@media (min-width: 768px) {
-  .estudio .c-izq { grid-column: 1 / span 5; }
-  .estudio .c-der { grid-column: 7 / -1; }
+@media (prefers-reduced-motion: reduce) {
+  .encargo-fondo { display: none; }
+  .encargo:hover h3 { text-decoration: underline; text-underline-offset: 6px; }
 }
-.ficha { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; padding-top: 1rem; font-size: .875rem; }
-.ficha p + p { margin-top: .5rem; color: var(--ink); }
 
-/* Retrato de dirección. Ancho contenido: en la columna de 5 el marco 3:4
-   ya es alto, y a pantalla completa una cara del tamaño de un proyecto
-   desequilibraría la jerarquía —la obra manda, la autora acompaña. */
-.retrato { margin-top: 2.5rem; max-width: 20rem; }
-.retrato figcaption { margin-top: .75rem; color: var(--body); }
+/* ── Clientes: cinta continua ─────────────────────────────────
+   Misma fisica que la Marquesina de arriba (velocidad de scroll ->
+   avance), aplicada a tarjetas en vez de a terminos sueltos. Cabecera a
+   una columna, sin `.cabecera`, para que se distinga de Proyectos y
+   Servicios desde el primer vistazo. */
+.clientes { padding-block: 6rem; }
+@media (min-width: 768px) { .clientes { padding-block: 9rem; } }
+.clientes-cabecera { max-width: 52ch; margin-bottom: 3.5rem; }
+.clientes-cabecera .h2 { margin-top: .5rem; }
+.clientes-cabecera .small { margin-top: 1rem; }
 
-/* ── Proceso: es una secuencia real, por eso va numerado ─── */
-.etapas { row-gap: 3rem; }
-.etapa { grid-column: 1 / -1; position: relative; padding-top: 1.5rem; }
-@media (min-width: 768px) { .etapa { grid-column: span 3; } }
-.regla { position: absolute; top: 0; left: 0; display: block; width: 100%; height: 1px; background: var(--ink); transform-origin: left; }
-.etapa h3 { margin-top: .75rem; font-size: 1.25rem; font-weight: 300; color: var(--ink); }
-.etapa p.small { margin-top: .75rem; }
+.cinta { background: rgba(214,212,201,.22); border-block: 1px solid var(--sand); padding-block: 3rem; overflow: hidden; }
+.cinta-pista { display: flex; gap: 0; will-change: transform; }
+.cinta-grupo { display: flex; gap: 1.5rem; padding-right: 1.5rem; flex-shrink: 0; }
+.cinta-card {
+  flex: 0 0 auto; width: min(26rem, 78vw); min-height: 18rem;
+  background: var(--paper); border: 1px solid var(--sand); padding: 2rem;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 2rem;
+}
+.cinta-cita { margin: 0; font-weight: 300; color: var(--ink); font-size: clamp(1rem, 1.4vw, 1.0625rem); line-height: 1.55; }
+.cinta-pie { display: flex; align-items: center; gap: 1rem; }
+.avatar { flex: 0 0 auto; width: 3rem; aspect-ratio: 1; border-radius: 50%; background: var(--fog); border: 1px solid var(--sand); display: grid; place-items: center; object-fit: cover; }
+.avatar-iniciales { font-size: 13px; letter-spacing: .22em; color: var(--body); }
+.cinta-pie cite { display: block; font-style: normal; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); }
+.cinta-pie .obra { display: block; margin-top: .35rem; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--body); }
+
+/* Con movimiento reducido la cinta no se anima —clonar el grupo para un
+   loop que nunca corre solo duplicaria el DOM sin ganar nada—: una fila
+   con scroll horizontal nativo, cada tarjeta alcanzable. */
+.cinta-estatica { display: flex; gap: 1.5rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-inline: var(--pad); padding-bottom: 1rem; }
+.cinta-estatica .cinta-card { scroll-snap-align: start; }
+
+/* ── Puente: lo que cierra una seccion y la empuja al contacto ── │
+   Un parrafo corto y un enlace, en la misma linea cuando cabe. Sin boton:
+   el unico relleno del sitio es el CTA del hero y el de enviar. */
+.puente { margin-top: 3.5rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 2rem; }
+.puente p { max-width: 46ch; }
 
 /* ── Contacto ────────────────────────────────────────────── */
 .contacto { background: var(--ink); color: var(--paper); }
@@ -643,8 +707,10 @@ html { scroll-behavior: smooth; }
 }
 .contacto .h2, .contacto .display { color: var(--paper); }
 .contacto .eyebrow { color: var(--sand); }
+.contacto .lead { color: var(--sand); margin-top: 1.5rem; max-width: 44ch; }
 .datos { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.5rem; font-size: .875rem; }
 .datos .valor { margin-top: .5rem; display: inline-block; color: var(--paper); font-size: 1rem; }
+.datos .con-icono { display: inline-flex; align-items: center; gap: .5rem; }
 
 .campo + .campo { margin-top: 2rem; }
 .campo label { display: block; margin-bottom: .75rem; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--sand); }

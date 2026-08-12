@@ -1,6 +1,6 @@
 # Portafolio de arquitectura
 
-Sitio de una página para un estudio de arquitectura. React + Vite, con
+Sitio de una página para una arquitecta. React + Vite, con
 framer-motion para el movimiento y CSS propio con tokens.
 
 El contenido es de ejemplo: los proyectos, el nombre y los datos de

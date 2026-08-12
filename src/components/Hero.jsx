@@ -119,16 +119,17 @@ export default function Hero({ arrancar }) {
         <div className="g12">
           <motion.p className="eyebrow c-eyebrow" custom={0} variants={aparece}
                     initial="hidden" animate={estado}>
-            Estudio de arquitectura · Santiago de Chile
+            Arquitecta · Santiago de Chile · En ejercicio desde 2013
           </motion.p>
 
           <TituloHero texto="Espacio, luz y materia" className="display" arrancar={arrancar} />
 
           <motion.p className="lead c-lead" custom={1} variants={aparece}
                     initial="hidden" animate={estado}>
-            Proyectamos casas, equipamiento público y rehabilitaciones donde la
-            construcción se lee con claridad. Doce años de obra entre la cordillera
-            y el litoral.
+            Proyecto y dirijo casas, equipamiento público y rehabilitaciones.
+            Sesenta y cuatro obras entregadas desde 2013, todas con la misma
+            arquitecta en terreno: de la primera visita a la recepción
+            municipal.
           </motion.p>
 
           <motion.div className="c-cta" custom={2} variants={aparece}

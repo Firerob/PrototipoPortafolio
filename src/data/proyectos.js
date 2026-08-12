@@ -189,13 +189,53 @@ export const proyectos = [
   },
 ]
 
-/** El retrato de quien dirige el estudio. Vive en la sección Estudio. */
+/** El retrato de Marina. Vive anclado en la sección Perfil. */
 export const retrato = {
   src: fotoMarina,
   w: 735,
   h: 985,
   alt: 'Marina Olivares, arquitecta, sentada en un sillón sobre fondo oscuro',
 }
+
+/**
+ * Los hitos que recorre la sección Perfil, en orden. No es un currículum:
+ * cada entrada existe porque trae una cifra que se puede comprobar contra
+ * `cifras` o contra un proyecto de arriba. `anio` va suelto —no dentro del
+ * texto— porque en la sección es una columna propia que se enciende con el
+ * scroll, igual que antes se encendían las palabras del manifiesto.
+ */
+export const trayectoria = [
+  {
+    anio: '2012',
+    titulo: 'Título, PUC',
+    texto: 'Arquitecta por la Pontificia Universidad Católica de Chile. Los dos últimos años los pasé en faena, como ayudante de inspección técnica: aprendí a leer un plano por lo que cuesta construirlo.',
+  },
+  {
+    anio: '2013',
+    titulo: 'Consulta propia',
+    texto: 'Abrí por mi cuenta con un solo encargo: 96 m² en Buin, con un presupuesto que no admitía una partida de más. Se entregó en plazo y en precio. Sigo trabajando igual.',
+  },
+  {
+    anio: '2016',
+    titulo: 'Primer equipamiento público',
+    texto: 'Gané por concurso la sala cívica de Machalí, 620 m². Primer encargo con plazo municipal y gasto auditado: se recibió sin observaciones que rehacer.',
+  },
+  {
+    anio: '2019',
+    titulo: 'Bienal de Arquitectura de Chile',
+    texto: 'Mención por tres casas del secano costero levantadas a 18 UF/m². Es la cifra de la que sigo más orgullosa, y la que más me piden que repita.',
+  },
+  {
+    anio: '2022',
+    titulo: 'Escala',
+    texto: '2.400 m² de mercado para una cooperativa de ochenta socios en Rancagua, entregados en catorce meses y sin aumento de obra. Desde entonces el equipamiento público es un tercio de mi trabajo.',
+  },
+  {
+    anio: '2025',
+    titulo: 'En obra',
+    texto: 'La Biblioteca del Río levanta sus muros en Valdivia. La inspecciono cada semana, como las sesenta y tres anteriores.',
+  },
+]
 
 export const categorias = [
   { id: 'todos', etiqueta: 'Todos' },
@@ -205,6 +245,7 @@ export const categorias = [
   { id: 'interiorismo', etiqueta: 'Interiorismo' },
 ]
 
+// Sin uso desde que se retiro la seccion Proceso. Se conserva por si vuelve.
 export const etapas = [
   {
     n: '01',
@@ -229,7 +270,7 @@ export const etapas = [
 ]
 
 export const cifras = [
-  { etiqueta: 'Fundado', valor: 2013, formato: 'plano' },
+  { etiqueta: 'En ejercicio desde', valor: 2013, formato: 'plano' },
   { etiqueta: 'Obras entregadas', valor: 64, formato: 'entero' },
   { etiqueta: 'm² construidos', valor: 38400, formato: 'miles' },
   { etiqueta: 'Distinciones', valor: 9, formato: 'cero' },
@@ -237,9 +278,85 @@ export const cifras = [
 
 export const navegacion = [
   { href: '#proyectos', etiqueta: 'Proyectos' },
-  { href: '#estudio', etiqueta: 'Estudio' },
-  { href: '#proceso', etiqueta: 'Proceso' },
+  { href: '#perfil', etiqueta: 'Perfil' },
+  { href: '#servicios', etiqueta: 'Servicios' },
   { href: '#contacto', etiqueta: 'Contacto' },
+]
+
+/**
+ * Los servicios repiten, en el mismo orden, los ambitos de la marquesina:
+ * ahi son un rotulo, aqui llevan lo que implica cada uno. El <select> de
+ * Contacto sigue la misma lista. Tres sitios, una sola taxonomia.
+ */
+export const servicios = [
+  {
+    titulo: 'Vivienda unifamiliar',
+    alcance: 'Anteproyecto → recepción municipal',
+    texto: 'Casa nueva en terreno propio, de 90 a 450 m². Entre dieciocho y treinta meses desde la primera visita hasta las llaves, con el presupuesto cerrado antes de mover la primera máquina. Es la mitad de mi obra entregada.',
+  },
+  {
+    titulo: 'Equipamiento público',
+    alcance: 'Concurso · Encargo directo',
+    texto: 'Bibliotecas, pabellones y mercados de 600 a 2.400 m². Programa exigente, gasto auditado y plazo municipal: he entregado once, todos dentro del monto adjudicado.',
+  },
+  {
+    titulo: 'Rehabilitación',
+    alcance: 'Levantamiento · Proyecto',
+    texto: 'Intervenir lo construido sin borrarlo. Entrego el levantamiento del estado actual y un informe con cifras: qué conviene conservar y qué sale más caro mantener que rehacer. La parte nueva se distingue de la vieja en vez de imitarla.',
+  },
+  {
+    titulo: 'Interiorismo',
+    alcance: 'Obra propia o ajena',
+    texto: 'Pocos materiales, bien puestos. Incluye mobiliario fijo, iluminación y una especificación cerrada partida por partida, que es lo que evita las improvisaciones de obra: las que se pagan al doble.',
+  },
+  {
+    titulo: 'Dirección de obra',
+    alcance: 'Con o sin proyecto propio',
+    texto: 'Inspección semanal en terreno, revisión de estados de pago y coordinación de especialidades. Se contrata sola, sobre planos de otra oficina: en los últimos cinco años recuperé plazo en siete de las nueve que recibí así.',
+  },
+]
+
+/**
+ * Inventados, como todo el sitio, pero atados a clientes que ya existen en
+ * `proyectos`. Cada cita trae la cifra de su propia obra, comprobable mas
+ * arriba en este mismo archivo.
+ *
+ * `foto` esta reservado y hoy va vacio a proposito. El hueco de la cinta
+ * NO se rellena con banco de imagenes —un avatar de stock desmiente la
+ * cita mas rapido de lo que la respalda—: mientras no haya retrato real,
+ * el componente pinta las iniciales sobre fondo plano.
+ */
+export const testimonios = [
+  {
+    cita: 'Pedimos 480 m² y nos convenció de construir 420. Ahorramos catorce millones y dos años después no hay una pieza que no usemos a diario.',
+    autor: 'Paula Errázuriz y Tomás Vergara',
+    obra: 'Casa Ladera · Farellones, 2024',
+    foto: null,
+  },
+  {
+    cita: 'Veníamos de oficinas grandes donde cada mes hablábamos con alguien distinto. Aquí la misma persona que dibujó los 1.850 m² estuvo en terreno el día de la recepción, y no quedó una observación que rehacer.',
+    autor: 'Claudia Bustos',
+    obra: 'Pabellón Lumen · Municipalidad de Valparaíso',
+    foto: null,
+  },
+  {
+    cita: 'Éramos ochenta socios con ochenta opiniones. Llegó con tres maquetas, explicó qué perdía cada una y votamos en una tarde. Catorce meses después estábamos vendiendo, con el presupuesto intacto.',
+    autor: 'Héctor Sanhueza',
+    obra: 'Mercado Central · Cooperativa de comerciantes de Rancagua',
+    foto: null,
+  },
+  {
+    cita: 'El silo llevaba veinte años cerrado y tres presupuestos decían que había que botarlo. Conservó los arcos, entregó 180 m² habitables y costó menos que la demolición.',
+    autor: 'Rosario Melo',
+    obra: 'Silo · Talca, 2021',
+    foto: null,
+  },
+  {
+    cita: 'Vamos en el mes once de obra, con inspección todas las semanas y un solo aumento, por debajo del dos por ciento. En un municipio eso no es lo normal: es lo que uno pide y casi nunca recibe.',
+    autor: 'Andrés Kramer',
+    obra: 'Biblioteca del Río · Municipalidad de Valdivia',
+    foto: null,
+  },
 ]
 
 export const ambitos = [

@@ -56,7 +56,7 @@ function Cifra({ etiqueta, valor, formato }) {
 
 export default function Cifras() {
   return (
-    <section className="cifras" aria-label="El estudio en cifras">
+    <section className="cifras" aria-label="El trabajo en cifras">
       <div className="wrap">
         <dl>
           {cifras.map((c) => (
