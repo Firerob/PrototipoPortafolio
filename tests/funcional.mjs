@@ -679,7 +679,7 @@ async function main() {
     anota('Con movimiento reducido no hay cursor propio',
       (await page2.$('.cursor-punto')) === null)
     anota('Con movimiento reducido el titular sigue completo',
-      await page2.$eval('.hero h1', (n) => n.textContent.trim() === 'Espacio, luz y materia'),
+      await page2.$eval('.hero h1', (n) => n.textContent.trim() === 'Construyo lo que dibujo'),
       await page2.$eval('.hero h1', (n) => `"${n.textContent.trim()}"`))
     anota('Con movimiento reducido las fotos se ven sin cortina',
       await page2.$eval('.card .marco', (n) => !getComputedStyle(n).clipPath.includes('100%')))

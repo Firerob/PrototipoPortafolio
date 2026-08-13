@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { motion, useScroll, useVelocity, useAnimationFrame, useMotionValue, useTransform, wrap } from 'framer-motion'
 import { testimonios } from '../data/proyectos.js'
 import { useSinMovimiento } from '../hooks/useMovimiento.js'
@@ -42,19 +42,13 @@ function Tarjeta({ t }) {
  * Marquesina): asi cada mitad de la pista mide exactamente el 50% y
  * `wrap(-50, 0, v)` no arrastra un salto en la costura.
  *
- * La pausa al pasar el mouse no existe con el dedo —no hay hover en
- * tactil—, asi que ahi la cinta animada no se puede controlar: se leeria
- * a la velocidad que la cinta decida, sin poder pararla. Por eso, igual
- * que ya hace `TituloHero` con el iman de letras, se comprueba
- * `pointer: fine` antes de animar; sin puntero fino se muestra la fila
- * deslizable con el dedo (`.cinta-estatica`) en su lugar.
+ * Tambien se mueve en tactil: ahi el mouse no existe, asi que la pausa se
+ * ata al toque —mantener el dedo sobre una tarjeta la detiene, igual que
+ * el hover en escritorio— en vez de a eventos que ahi nunca llegarian.
  */
 export default function Testimonios() {
   const sinMovimiento = useSinMovimiento()
-  const [punteroFino] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches
-  )
-  const animada = !sinMovimiento && punteroFino
+  const animada = !sinMovimiento
 
   const base = useMotionValue(0)
   const rumbo = useRef(1)
@@ -108,6 +102,8 @@ export default function Testimonios() {
           onMouseLeave={reanudar}
           onFocusCapture={pausar}
           onBlurCapture={reanudar}
+          onTouchStart={pausar}
+          onTouchEnd={reanudar}
         >
           <motion.div className="cinta-pista" style={{ x }}>
             {grupo(false)}

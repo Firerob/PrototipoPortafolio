@@ -122,14 +122,13 @@ export default function Hero({ arrancar }) {
             Arquitecta · Santiago de Chile · En ejercicio desde 2013
           </motion.p>
 
-          <TituloHero texto="Espacio, luz y materia" className="display" arrancar={arrancar} />
+          <TituloHero texto="Construyo lo que dibujo" className="display" arrancar={arrancar} />
 
           <motion.p className="lead c-lead" custom={1} variants={aparece}
                     initial="hidden" animate={estado}>
-            Proyecto y dirijo casas, equipamiento público y rehabilitaciones.
-            Sesenta y cuatro obras entregadas desde 2013, todas con la misma
-            arquitecta en terreno: de la primera visita a la recepción
-            municipal.
+            Proyecto y dirijo casas, equipamiento público y rehabilitaciones,
+            con la misma arquitecta en terreno de principio a fin: de la
+            primera visita a la recepción municipal.
           </motion.p>
 
           <motion.div className="c-cta" custom={2} variants={aparece}

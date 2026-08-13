@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { servicios } from '../data/proyectos.js'
 import { useSinMovimiento } from '../hooks/useMovimiento.js'
@@ -10,9 +11,46 @@ import { TituloPartido } from './Texto.jsx'
  * (`.encargo-regla`, era `.regla`) en vez de perderse con el resto. El
  * ritmo horizontal y el titulo grande la distinguen de Proyectos y de
  * Testimonios, que son las otras dos secciones con lista.
+ *
+ * El barrido de fondo (`.encargo-fondo`) es un efecto de :hover, y en
+ * tactil no hay hover: sin esto, en movil las filas se verian siempre
+ * "apagadas". Para que la fila se sienta igual de viva ahi, se marca como
+ * activa sola la que ocupa el centro de la pantalla mientras se hace
+ * scroll —mismo criterio que ya usa `useSeccionActiva` para el link del
+ * nav— y esa marca dispara el mismo CSS que el hover, via `.activo`.
  */
 export default function Servicios() {
   const sinMovimiento = useSinMovimiento()
+  const listaRef = useRef(null)
+  const [activo, setActivo] = useState(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.matchMedia('(hover: hover)').matches) return
+    if (typeof IntersectionObserver === 'undefined') return
+
+    const el = listaRef.current
+    if (!el) return
+    const filas = Array.from(el.querySelectorAll('.encargo'))
+    const visibles = new Map()
+
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        for (const e of entradas) {
+          const indice = filas.indexOf(e.target)
+          if (indice === -1) continue
+          if (e.isIntersecting) visibles.set(indice, e.intersectionRatio)
+          else visibles.delete(indice)
+        }
+        if (!visibles.size) return
+        const [[ganadora]] = [...visibles.entries()].sort((a, b) => b[1] - a[1])
+        setActivo(ganadora)
+      },
+      { rootMargin: '-45% 0px -45% 0px', threshold: [0, 0.25, 0.5, 1] }
+    )
+    filas.forEach((f) => observador.observe(f))
+    return () => observador.disconnect()
+  }, [])
 
   return (
     <section id="servicios" className="seccion">
@@ -29,9 +67,9 @@ export default function Servicios() {
           </Revelar>
         </div>
 
-        <ol className="encargos">
+        <ol className="encargos" ref={listaRef}>
           {servicios.map((s, i) => (
-            <li className="encargo" key={s.titulo}>
+            <li className={`encargo${activo === i ? ' activo' : ''}`} key={s.titulo}>
               {sinMovimiento ? (
                 <span className="encargo-regla" aria-hidden="true" />
               ) : (

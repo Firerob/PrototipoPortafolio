@@ -227,6 +227,12 @@ html { scroll-behavior: smooth; }
   grid-column: 1 / -1;
   position: absolute; left: var(--pad); right: var(--pad); top: -11rem; z-index: 1;
 }
+/* En telefonos angostos el piso de .display (2.6rem) ya no deja aire: a
+   este ancho el titulo se lee apretado contra los bordes. Un poco menos
+   de tamaño, solo aqui. */
+@media (max-width: 480px) {
+  .hero h1 { font-size: clamp(2.1rem, 8.5vw, 2.35rem); }
+}
 @media (min-width: 768px) {
   .hero h1 { position: static; left: auto; right: auto; top: auto; z-index: auto; }
 }
@@ -648,6 +654,14 @@ html { scroll-behavior: smooth; }
 .encargo-n span { font-variant-numeric: tabular-nums; font-size: 13px; letter-spacing: .22em; color: var(--mute); }
 .encargo h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 2.25rem); font-weight: 200; letter-spacing: -.02em; color: var(--ink); }
 .encargo-texto { max-width: 46ch; }
+
+/* `.activo` es el equivalente por scroll del :hover de abajo, para
+   pantallas sin hover (ver Servicios.jsx). Fuera de la media query para
+   que corra sin depender de la capacidad del dispositivo. */
+.encargo.activo .encargo-fondo { transform: scaleX(1); }
+.encargo.activo h3, .encargo.activo .encargo-texto,
+.encargo.activo .encargo-n span, .encargo.activo .encargo-alcance { color: var(--paper); }
+
 @media (hover: hover) {
   .encargo:hover .encargo-fondo, .encargo:focus-within .encargo-fondo { transform: scaleX(1); }
   .encargo:hover h3, .encargo:hover .encargo-texto,
@@ -655,7 +669,7 @@ html { scroll-behavior: smooth; }
 }
 @media (prefers-reduced-motion: reduce) {
   .encargo-fondo { display: none; }
-  .encargo:hover h3 { text-decoration: underline; text-underline-offset: 6px; }
+  .encargo:hover h3, .encargo.activo h3 { text-decoration: underline; text-underline-offset: 6px; }
 }
 
 /* ── Clientes: cinta continua ─────────────────────────────────
