@@ -1,9 +1,25 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useScroll, useVelocity, useAnimationFrame, useMotionValue, useTransform, wrap } from 'framer-motion'
 import { testimonios } from '../data/proyectos.js'
 import { useSinMovimiento } from '../hooks/useMovimiento.js'
 import Revelar from './Revelar.jsx'
 import { TituloPartido } from './Texto.jsx'
+
+/** Mismo patron que `useAnclajePosible` en Perfil.jsx. */
+function useEsMovil() {
+  const consulta = '(max-width: 767px)'
+  const [movil, setMovil] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(consulta).matches
+  )
+  useEffect(() => {
+    const mq = window.matchMedia(consulta)
+    const actualizar = () => setMovil(mq.matches)
+    actualizar()
+    mq.addEventListener('change', actualizar)
+    return () => mq.removeEventListener('change', actualizar)
+  }, [])
+  return movil
+}
 
 /** Iniciales de las dos primeras palabras del nombre, para el avatar. */
 function iniciales(nombre) {
@@ -48,6 +64,7 @@ function Tarjeta({ t }) {
  */
 export default function Testimonios() {
   const sinMovimiento = useSinMovimiento()
+  const movil = useEsMovil()
   const animada = !sinMovimiento
 
   const base = useMotionValue(0)
@@ -59,9 +76,11 @@ export default function Testimonios() {
   const factor = useTransform(velocidad, [-2000, 0, 2000], [-5, 1, 5], { clamp: false })
   const x = useTransform(base, (v) => `${wrap(-50, 0, v)}%`)
 
+  // Un poco mas rapida en movil: ahi la tarjeta es mas angosta (78vw) y a
+  // la misma velocidad de escritorio se siente lenta de cruzar.
   useAnimationFrame((_, delta) => {
     if (!animada || pausada.current) return
-    let avance = (-1.4 * delta) / 1000
+    let avance = ((movil ? -1.8 : -1.4) * delta) / 1000
 
     const v = velocidad.get()
     if (v < 0) rumbo.current = -1
