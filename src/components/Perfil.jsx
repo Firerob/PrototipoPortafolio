@@ -7,13 +7,16 @@ import { TituloPartido } from './Texto.jsx'
 
 /**
  * El anclaje solo tiene sentido si hay sitio de sobra: seis hitos mas un
- * retrato no caben ancladas en un telefono, y forzarlo dejaria la mitad
- * del contenido fuera de la pantalla pinneada. `sinMovimiento` ya apaga el
- * anclaje por su cuenta (ver companiente `anclado` en Perfil()); esto
- * cubre el otro caso, el de una pantalla chica con movimiento activado.
+ * retrato no caben ancladas en una ventana angosta, y forzarlo dejaria
+ * texto cortado por el borde inferior de la pantalla pinneada (dos
+ * columnas de hitos necesitan bastante ancho para no forzar el texto a
+ * envolver en demasiadas lineas). `sinMovimiento` ya apaga el anclaje por
+ * su cuenta (ver companiente `anclado` en Perfil()); esto cubre el otro
+ * caso, el de una ventana chica con movimiento activado. Por debajo de
+ * este umbral la seccion cae al mismo flujo estatico que el telefono.
  */
 function useAnclajePosible() {
-  const consulta = '(min-width: 768px) and (min-height: 640px)'
+  const consulta = '(min-width: 1200px) and (min-height: 850px)'
   const [ok, setOk] = useState(
     () => typeof window !== 'undefined' && window.matchMedia(consulta).matches
   )
@@ -152,7 +155,15 @@ export default function Perfil() {
   })
 
   const anchoRegla = useTransform(recorrido, [0, 0.3], ['0%', '100%'])
-  const escalaEje = useTransform(recorrido, [0.05, 0.9], [0, 1])
+  // Anclada, la trayectoria se reparte en dos columnas (mitad y mitad) para
+  // no apilar seis hitos en una sola franja vertical que termina mas alta
+  // que la pantalla. Cada columna dibuja su propio eje sobre el tramo de
+  // scroll que le toca: la primera mientras se encienden sus tres hitos,
+  // la segunda a continuacion, sin quiebre en el reparto original (0.05-0.9).
+  const mitad = Math.ceil(trayectoria.length / 2)
+  const puntoMedio = 0.05 + (0.9 - 0.05) * (mitad / trayectoria.length)
+  const escalaEje1 = useTransform(recorrido, [0.05, puntoMedio], [0, 1])
+  const escalaEje2 = useTransform(recorrido, [puntoMedio, 0.9], [0, 1])
   const cortina = useTransform(entrada, [0.15, 0.75], ['inset(0 0 100% 0)', 'inset(0 0 0% 0)'])
   const escalaFoto = useTransform(entrada, [0.15, 1], [1.08, 1])
   const opacidadCartel = useTransform(entrada, [0.6, 0.95], [0, 1])
@@ -189,23 +200,50 @@ export default function Perfil() {
             <div className="perfil-relato">
               <TituloPartido texto="Quien dibuja, dirige" className="h2" />
 
-              <div className="hitos-envoltorio">
-                {anclado
-                  ? <motion.span className="perfil-eje" style={{ scaleY: escalaEje }} aria-hidden="true" />
-                  : <span className="perfil-eje" aria-hidden="true" />}
-                <ol className="hitos">
-                  {trayectoria.map((hito, i) => (
-                    <Hito
-                      key={hito.anio}
-                      hito={hito}
-                      indice={i}
-                      anclado={anclado}
-                      progreso={recorrido}
-                      rango={[0.06 + i * 0.14, 0.20 + i * 0.14]}
-                    />
+              {anclado ? (
+                <div className="hitos-columnas">
+                  {[trayectoria.slice(0, mitad), trayectoria.slice(mitad)].map((columna, c) => (
+                    <div className="hitos-envoltorio" key={c}>
+                      <motion.span
+                        className="perfil-eje"
+                        style={{ scaleY: c === 0 ? escalaEje1 : escalaEje2 }}
+                        aria-hidden="true"
+                      />
+                      <ol className="hitos">
+                        {columna.map((hito, local) => {
+                          const i = c * mitad + local
+                          return (
+                            <Hito
+                              key={hito.anio}
+                              hito={hito}
+                              indice={i}
+                              anclado={anclado}
+                              progreso={recorrido}
+                              rango={[0.06 + i * 0.14, 0.20 + i * 0.14]}
+                            />
+                          )
+                        })}
+                      </ol>
+                    </div>
                   ))}
-                </ol>
-              </div>
+                </div>
+              ) : (
+                <div className="hitos-envoltorio">
+                  <span className="perfil-eje" aria-hidden="true" />
+                  <ol className="hitos">
+                    {trayectoria.map((hito, i) => (
+                      <Hito
+                        key={hito.anio}
+                        hito={hito}
+                        indice={i}
+                        anclado={anclado}
+                        progreso={recorrido}
+                        rango={[0.06 + i * 0.14, 0.20 + i * 0.14]}
+                      />
+                    ))}
+                  </ol>
+                </div>
+              )}
             </div>
 
             <Retrato

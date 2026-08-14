@@ -134,8 +134,8 @@ export default function Proyectos() {
             <TituloPartido texto="Proyectos seleccionados" className="h2" />
           </div>
           <Revelar as="p" className="small c-nota">
-            Seis obras entre 2021 y 2025, 6.260 m² en total. La última se
-            recibe este año.
+            Seis obras entre 2021 y 2025, 4.725 m² en total. La última
+            todavía está en obra.
           </Revelar>
         </div>
 

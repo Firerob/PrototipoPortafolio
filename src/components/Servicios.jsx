@@ -58,7 +58,7 @@ export default function Servicios() {
         <div className="g12 cabecera">
           <div className="c-titulo">
             <Revelar as="p" className="eyebrow">Servicios</Revelar>
-            <TituloPartido texto="Encargos que tomo" className="h2" />
+            <TituloPartido texto="Me especializo en" className="h2" />
           </div>
           <Revelar as="p" className="small c-nota">
             Cinco líneas de trabajo. En todas dirijo la obra: el encargo no

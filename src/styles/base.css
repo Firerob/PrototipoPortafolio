@@ -577,14 +577,23 @@ html { scroll-behavior: smooth; }
   min-height: 100svh; padding-block: 7rem 5rem;
   display: grid; grid-template-rows: auto 1fr auto; gap: 3rem;
 }
-@media (min-width: 768px) { .perfil .caja { padding-block: 9rem 6rem; gap: 4rem; } }
-@media (max-height: 820px) { .perfil .caja { padding-block: 6rem 3.5rem; gap: 2rem; } }
+/* Un solo tramo para escritorio, sin variante extra por altura: dos
+   variantes que se cruzan justo por donde vive la mayoria de las ventanas
+   reales (768-1080px de alto) es lo que producia un salto de sobra a
+   corte en el borde de esa media query. Mejor un solo valor, compacto,
+   que ya deja aire de sobra en pantallas altas gracias al `min-height`. */
+@media (min-width: 768px) { .perfil .caja { padding-block: 4.5rem 2.5rem; gap: 1.5rem; } }
 
 .perfil-rotulo { display: flex; align-items: center; gap: 1.5rem; }
 .perfil-rotulo .eyebrow { color: var(--sand); flex-shrink: 0; }
 .perfil-regla { display: block; height: 1px; background: rgba(214,213,210,.35); }
 
-.perfil-cuerpo { align-content: center; row-gap: 3rem; }
+/* `align-items: start` (no el `stretch` por defecto de grid): sin esto el
+   retrato se estira a la altura de la columna de hitos, mas alta, y dejaba
+   un tramo negro vacio entre la foto y su leyenda —la leyenda quedaba
+   pegada al fondo de esa caja estirada en vez de justo bajo la foto, y ese
+   tramo de mas era buena parte de lo que se cortaba en pantallas cortas. */
+.perfil-cuerpo { align-content: center; align-items: start; row-gap: 3rem; }
 .perfil-relato { grid-column: 1 / -1; }
 .perfil-retrato { grid-column: 1 / -1; position: relative; }
 /* En movil el orden del documento (relato primero, retrato despues) deja
@@ -597,11 +606,11 @@ html { scroll-behavior: smooth; }
   .perfil-retrato { order: -1; max-width: 18rem; margin-inline: auto; }
 }
 @media (min-width: 768px) {
-  .perfil-relato { grid-column: 1 / span 6; }
+  .perfil-relato { grid-column: 1 / span 7; }
   /* Ancho contenido: a pantalla completa una cara del tamaño de un
      proyecto desequilibraría la jerarquía —la obra manda, la autora
      acompaña—, el mismo criterio que ya regia el retrato de Estudio. */
-  .perfil-retrato { grid-column: 8 / -1; max-width: 20rem; margin-left: auto; }
+  .perfil-retrato { grid-column: 9 / -1; max-width: 20rem; margin-left: auto; }
 }
 .perfil .h2 { color: var(--paper); font-size: clamp(1.75rem, 3.4vw, 2.75rem); }
 
@@ -620,7 +629,7 @@ html { scroll-behavior: smooth; }
    Los que aun no llegan a su tramo NO bajan a opacidad 0 —6.6:1 sobre
    --ink, igual que las palabras sin encender de antes— para que quien
    entra directo a #perfil por link no vea filas en blanco. */
-.hitos-envoltorio { position: relative; margin-top: 2.5rem; }
+.hitos-envoltorio { position: relative; margin-top: 2rem; }
 .perfil-eje { position: absolute; left: 3px; top: .5rem; bottom: .5rem; width: 1px; background: rgba(214,213,210,.35); transform-origin: top; }
 .hitos { display: grid; row-gap: 1.75rem; padding-left: 1.75rem; }
 .hito { position: relative; }
@@ -628,13 +637,26 @@ html { scroll-behavior: smooth; }
 .hito-cabeza { display: flex; align-items: baseline; gap: 1rem; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
 .hito-cabeza h3 { font-size: inherit; letter-spacing: inherit; text-transform: inherit; font-weight: 400; color: inherit; }
 .hito p { margin: .4rem 0 0; font-size: .8125rem; line-height: 1.5; max-width: 46ch; color: #8C8C89; }
-@media (max-height: 820px) { .hito p { font-size: .75rem; } }
+
+/* Anclada (PC), la trayectoria se reparte en dos columnas —ver Perfil.jsx—
+   para no apilar seis hitos en una franja mas alta que la pantalla. Con la
+   mitad de filas por columna sobra altura para un texto mas grande sin
+   volver a desbordar; `max-width` en ch ya no aplica (cada columna es mas
+   angosta que 46ch), el ancho lo da la columna misma. Un solo tramo de
+   medidas, por la misma razon que `.perfil .caja`: nada de variante extra
+   por `max-height` que salte justo donde vive la mayoria de las pantallas. */
+.hitos-columnas { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2.5rem; }
+.hitos-columnas .hitos-envoltorio { margin-top: 1.25rem; }
+.hitos-columnas .hitos { row-gap: 1.25rem; }
+.hitos-columnas .hito-cabeza { font-size: 13px; }
+.hitos-columnas .hito p { font-size: .9375rem; line-height: 1.5; max-width: none; }
 
 .perfil-pie {
   display: flex; flex-wrap: wrap; align-items: baseline;
   justify-content: space-between; gap: .5rem 2rem;
   padding-top: 1.5rem; border-top: 1px solid rgba(214,213,210,.18);
 }
+@media (min-width: 768px) { .perfil-pie { padding-top: 1rem; } }
 .perfil-pie p { margin: 0; color: var(--sand); max-width: 52ch; }
 .perfil-pie a { color: var(--paper); }
 
@@ -683,13 +705,20 @@ html { scroll-behavior: smooth; }
 .clientes-cabecera .h2 { margin-top: .5rem; }
 .clientes-cabecera .small { margin-top: 1rem; }
 
-.cinta { background: rgba(214,212,201,.22); border-block: 1px solid var(--sand); padding-block: 3rem; overflow: hidden; }
+.cinta { background: rgba(214,212,201,.22); border-block: 1px solid var(--sand); padding-block: 3rem; overflow: hidden; touch-action: pan-y; }
 .cinta-pista { display: flex; gap: 0; will-change: transform; }
 .cinta-grupo { display: flex; gap: 1.5rem; padding-right: 1.5rem; flex-shrink: 0; }
 .cinta-card {
   flex: 0 0 auto; width: min(26rem, 78vw); min-height: 18rem;
   background: var(--paper); border: 1px solid var(--sand); padding: 2rem;
   display: flex; flex-direction: column; justify-content: space-between; gap: 2rem;
+}
+/* Mas chicas en movil: a doble velocidad y arrastrables, una tarjeta de
+   escritorio se cruza en un instante y estorba para leerla a mano. */
+@media (max-width: 767px) {
+  .cinta-card { width: min(18rem, 62vw); min-height: 12.5rem; padding: 1.25rem; gap: 1.25rem; }
+  .cinta-grupo { gap: 1rem; padding-right: 1rem; }
+  .cinta-cita { font-size: .875rem; line-height: 1.45; }
 }
 .cinta-cita { margin: 0; font-weight: 300; color: var(--ink); font-size: clamp(1rem, 1.4vw, 1.0625rem); line-height: 1.55; }
 .cinta-pie { display: flex; align-items: center; gap: 1rem; }
